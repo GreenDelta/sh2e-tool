@@ -1,19 +1,21 @@
 package org.openlca.app.sh2e;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
+import org.eclipse.ui.forms.widgets.FormText;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openlca.app.editors.Editors;
 import org.openlca.app.editors.SimpleEditorInput;
 import org.openlca.app.editors.SimpleFormEditor;
 import org.openlca.app.rcp.images.Icon;
-import org.openlca.app.util.Colors;
 import org.openlca.app.util.UI;
 
 public class StartPage extends SimpleFormEditor {
@@ -67,27 +69,11 @@ public class StartPage extends SimpleFormEditor {
 					true,
 					false));
 
-			var comp = tk.createComposite(body);
-			// comp.setLayoutData(new GridData(
-			//		SWT.CENTER,
-			//		SWT.TOP,
-			//		true,
-			//		false));
-			UI.gridLayout(comp, 1);
-			UI.fillHorizontal(comp);
-			comp.setBackground(Colors.errorColor());
-
-			var text = tk.createFormText(comp, true);
-			var textGrid = new GridData(SWT.CENTER, SWT.TOP, true, false);
-			textGrid.widthHint = image.getImageData().width;
-			text.setLayoutData(textGrid);
-
-			//UI.gridData(text, false, false).widthHint =  image.getImageData().width;
-
-			text.setText(
+			var texts = new TextBuilder(
+					body, tk, image.getImageData().width);
+			texts.add(
 					"""
-			        <html>
-							<h1>Welcome to the sh2e-tool</h1>
+							<p><b>Welcome to the sh2e-tool</b></p>
 							<p>
 							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
 							eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
@@ -99,10 +85,36 @@ public class StartPage extends SimpleFormEditor {
 							Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
 							sit amet.
 							</p>
-							</html>
-							""".strip()
-					, true, true);
+							""".strip());
+
+			texts.add("""
+					<p><b>Product system templates</b></p>
+					<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+						eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+						voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
+						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+						<a href="#">Click here to create</a>
+					</p>
+					""");
 
 		}
+
+	}
+
+	private record TextBuilder(Composite body, FormToolkit tk, int width) {
+
+		FormText add(String text) {
+			var comp = tk.createComposite(body);
+			UI.gridLayout(comp, 1, 5, 5);
+			UI.fillHorizontal(comp);
+			var formText = tk.createFormText(comp, true);
+			var textGrid = new GridData(SWT.CENTER, SWT.TOP, true, false);
+			textGrid.widthHint = width;
+			formText.setLayoutData(textGrid);
+			formText.setText("<html>" + text + "</html>", true, true);
+			return formText;
+		}
+
 	}
 }
