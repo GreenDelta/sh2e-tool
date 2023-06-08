@@ -12,6 +12,13 @@
 		</editor>
 
 		<editor
+				class="org.openlca.app.sh2e.StartPage"
+				default="false"
+				id="sh2e.StartPage"
+				name="%Welcome">
+		</editor>
+
+		<editor
 				class="org.openlca.app.editors.CommentsEditor"
 				default="false"
 				id="CommentsEditor"
