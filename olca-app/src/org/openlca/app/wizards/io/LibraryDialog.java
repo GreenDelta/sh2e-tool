@@ -84,7 +84,9 @@ public class LibraryDialog extends FormDialog {
 		updateButtons();
 	}
 
-	private Button createCheckboxSection(Composite parent, FormToolkit tk, String label, Mode mode, Renderer renderer) {
+	private Button createCheckboxSection(
+			Composite parent, FormToolkit tk, String label, Mode mode, Renderer renderer
+	) {
 		var check = UI.radio(parent, tk, label);
 		check.setSelection(mode == selectedMode);
 		var composite = UI.composite(parent, tk);
