@@ -21,6 +21,7 @@ import org.openlca.app.wizards.ProcessWizard;
 import org.openlca.core.model.Flow;
 import org.openlca.core.model.FlowType;
 import org.openlca.core.model.ModelType;
+import org.openlca.jsonld.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,22 @@ class FlowInfoPage extends ModelPage<Flow> {
 		text(comp, M.Formula, "formula");
 		text(comp, M.Synonyms, "synonyms");
 		modelLink(comp, M.Location, "location");
+
+		// an extension field: "Lifetime"
+		var key = "Lifetime";
+		var text = UI.labeledText(comp, toolkit, key);
+		var props = getModel().readOtherProperties();
+		var lifeTime = Json.getString(props, key);
+		if (lifeTime != null) {
+			text.setText(lifeTime);
+		}
+		text.addModifyListener(e -> {
+			var next = text.getText();
+			var nextProps = getModel().readOtherProperties();
+			Json.put(nextProps, key, next);
+			getModel().writeOtherProperties(nextProps);
+			getEditor().setDirty();
+		});
 	}
 
 	private void processButton(InfoSection infoSection) {
