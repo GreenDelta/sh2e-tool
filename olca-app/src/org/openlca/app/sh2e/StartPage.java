@@ -83,7 +83,7 @@ public class StartPage extends SimpleFormEditor {
 			templateText.addHyperlinkListener(new HyperlinkAdapter() {
 				@Override
 				public void linkActivated(HyperlinkEvent e) {
-					TemplateDialog.show();
+					TemplateWizard.open();
 				}
 			});
 		}
