@@ -3,13 +3,8 @@ package org.openlca.app.sh2e;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.openlca.app.util.UI;
-
-import java.util.List;
 
 public class TemplateWizard extends Wizard {
 
@@ -47,21 +42,10 @@ public class TemplateWizard extends Wizard {
 			var body = UI.composite(parent);
 			UI.gridLayout(body, 1);
 			setControl(body);
-
-			var group = new Group(body, SWT.NONE);
-			UI.fillHorizontal(group);
-			UI.gridLayout(group, 1);
-			group.setText("Intended application");
-
-			var options = List.of(
-					"Micro-level decision support",
-					"Meso/Macro-level decision support",
-					"Accounting");
-			for (var opt : options) {
-				var btn = new Button(group, SWT.RADIO);
-				btn.setText(opt);
-			}
+			OptionGroup.of(Sh2e.Group.APPLICATION)
+					.renderOn(body);
+			OptionGroup.of(Sh2e.Group.MODELLING)
+					.renderOn(body);
 		}
 	}
-
 }
