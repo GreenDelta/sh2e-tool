@@ -3,7 +3,7 @@ package org.openlca.app.sh2e;
 import java.util.List;
 import java.util.Optional;
 
-public final class Sh2e {
+final class Sh2e {
 
 	public interface Option {
 		String label();
