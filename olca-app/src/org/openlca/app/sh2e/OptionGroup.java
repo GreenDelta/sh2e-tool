@@ -5,38 +5,66 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.openlca.app.sh2e.Sh2e.Option;
+import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.UI;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 class OptionGroup {
 
-	private final Sh2e.Group group;
-	private Sh2e.Option selected;
+	private final String scope;
+	private final String question;
+	private final List<Option> options;
+//	private Option selected;
 
-	private OptionGroup(Sh2e.Group group) {
-		this.group = group;
-		selected = group.options().get(0);
+	private Consumer<Option> listener;
+
+	private OptionGroup(
+			String scope, String question, List<Option> options
+	) {
+		this.scope = scope;
+		this.question = question;
+		this.options = options;
+	//	selected = options.isEmpty() ? null : options.get(0);
 	}
 
-	static OptionGroup of(Sh2e.Group group) {
-		return new OptionGroup(group);
+	static OptionGroup of(Scope group, String question) {
+		return new OptionGroup(
+				group.label(), question, group.options());
 	}
 
-	Option selected() {
-		return selected;
+	static OptionGroup of(
+			String title, String question, Option... options
+	) {
+		return new OptionGroup(
+				title, question, List.of(options));
 	}
 
-	void renderOn(Composite comp) {
-		var widget = new Group(comp, SWT.NONE);
-		UI.fillHorizontal(widget);
-		widget.setText(group.label());
-		UI.gridLayout(widget, 1);
+	void onSelect(Consumer<Option> fn) {
+		this.listener = fn;
+	}
+//	Option selected() {
+//		return selected;
+//	}
 
-		for (var opt : group.options()) {
-			var btn = new Button(widget, SWT.RADIO);
-			btn.setSelection(opt.equals(selected));
+	OptionGroup renderOn(Composite comp) {
+		var group = new Group(comp, SWT.NONE);
+		UI.fillHorizontal(group);
+		group.setText(scope);
+		UI.gridLayout(group, 1);
+		UI.label(group, question);
+		for (var opt : options) {
+			var btn = new Button(group, SWT.RADIO);
+			btn.setSelection(false);
 			btn.setText(opt.label());
-			Controls.onSelect(btn, e -> selected = opt);
+			Controls.onSelect(btn, e -> {
+				if (listener != null) {
+					listener.accept(opt);
+				}
+			});
 		}
+		return this;
 	}
 }

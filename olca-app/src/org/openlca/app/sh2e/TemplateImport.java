@@ -1,7 +1,6 @@
 package org.openlca.app.sh2e;
 
 import org.openlca.app.util.ErrorReporter;
-import org.openlca.core.DataDir;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.model.ProductSystem;
 import org.openlca.jsonld.input.JsonImport;

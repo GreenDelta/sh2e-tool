@@ -7,9 +7,12 @@ public final class Sh2e {
 
 	public interface Option {
 		String label();
+		Option Yes = () -> "Yes";
+		Option No = () -> "No";
 	}
 
-	public enum Group {
+	public enum Scope {
+
 		APPLICATION("Intended application", Application.values()),
 		MODELLING("Modelling principles", Modelling.values()),
 		PROSPECTIVITY("Prospectivity", Prospectivity.values()),
@@ -22,12 +25,12 @@ public final class Sh2e {
 		private final String label;
 		private final Option[] options;
 
-		Group(String label, Option[] options) {
+		Scope(String label, Option[] options) {
 			this.label = label;
 			this.options = options;
 		}
 
-		public static Optional<Group> of(String label) {
+		public static Optional<Scope> of(String label) {
 			if (label == null)
 				return Optional.empty();
 			for (var g : values()) {
