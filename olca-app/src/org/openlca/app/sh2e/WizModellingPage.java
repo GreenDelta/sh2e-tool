@@ -8,7 +8,9 @@ import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.UI;
 
-class WizModellingPage extends WizardPage  {
+import java.util.function.IntConsumer;
+
+class WizModellingPage extends WizardPage {
 
 	private final TemplateWizard wizard;
 
@@ -16,7 +18,7 @@ class WizModellingPage extends WizardPage  {
 		super("WizModellingPage");
 		this.wizard = wizard;
 		setTitle("Modelling principles");
-		setPageComplete(true);
+		setPageComplete(false);
 	}
 
 	@Override
@@ -25,12 +27,22 @@ class WizModellingPage extends WizardPage  {
 		UI.gridLayout(body, 1);
 		setControl(body);
 
+		var _checked = new boolean[2];
+		IntConsumer checked = group -> {
+			_checked[group] = true;
+			if (_checked[0] && _checked[1]) {
+				setPageComplete(true);
+			}
+		};
+
 		var scaleGroup = OptionGroup.of(
 				"Scale",
 				"What is the scale of the decision support?",
 				Application.MICRO, Application.MACRO);
-		scaleGroup.renderOn(body).onSelect(option ->
-				wizard.selection.put(Scope.APPLICATION, option));
+		scaleGroup.renderOn(body).onSelect(option -> {
+			checked.accept(0);
+			wizard.selection.put(Scope.APPLICATION, option);
+		});
 
 		var statusGroup = OptionGroup.of(
 				"Status quo",
@@ -38,6 +50,7 @@ class WizModellingPage extends WizardPage  {
 						"this change be modelled with a net benefit?",
 				Option.Yes, Option.No);
 		statusGroup.renderOn(body).onSelect(option -> {
+			checked.accept(1);
 			if (option.equals(Option.Yes)) {
 				wizard.selection.put(Scope.MODELLING, Modelling.CONSEQUENTIAL);
 			} else {
