@@ -1,10 +1,12 @@
 package org.openlca.app.sh2e;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.openlca.app.sh2e.Sh2e.Application;
+import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.UI;
@@ -18,6 +20,7 @@ class TemplateWizard extends Wizard {
 	private TemplateWizard() {
 		setNeedsProgressMonitor(true);
 		setWindowTitle("FCH-LCA tool");
+		setForcePreviousAndNextButtons(true);
 	}
 
 	static void open() {
@@ -37,6 +40,15 @@ class TemplateWizard extends Wizard {
 		addPage(new StartPage(this));
 	}
 
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		if (!selection.containsKey(Scope.MODELLING))
+			return new WizModellingPage(this);
+		return page instanceof WizTemplatePage
+				? null
+				: new WizTemplatePage(this);
+	}
+
 	private static class StartPage extends WizardPage {
 
 		private final TemplateWizard wizard;
@@ -48,7 +60,19 @@ class TemplateWizard extends Wizard {
 			setDescription("To get through this dialog, " +
 					"it is recommended that you refer to the " +
 					"SH2E guidelines for clarification.");
-			setPageComplete(false);
+			setPageComplete(true);
+		}
+
+		@Override
+		public IWizardPage getNextPage() {
+			return !wizard.selection.containsKey(Scope.MODELLING)
+					? new WizModellingPage(wizard)
+					: new WizTemplatePage(wizard);
+		}
+
+		@Override
+		public boolean canFlipToNextPage() {
+			return true;
 		}
 
 		@Override
@@ -64,14 +88,15 @@ class TemplateWizard extends Wizard {
 					Option.Yes, Option.No
 			);
 			group.renderOn(body).onSelect(option -> {
-				setPageComplete(true);
 				if (option.equals(Option.No)) {
 					wizard.selection.put(
 							Scope.APPLICATION, Application.ACCOUNTING);
+					wizard.selection.put(
+							Scope.MODELLING, Modelling.ATTRIBUTIONAL);
 				} else {
 					wizard.selection.remove(Scope.APPLICATION);
+					wizard.selection.remove(Scope.MODELLING);
 				}
-				System.out.println(wizard.selection);
 			});
 		}
 	}
