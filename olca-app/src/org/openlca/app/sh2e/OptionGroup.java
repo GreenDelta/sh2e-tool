@@ -17,9 +17,8 @@ class OptionGroup {
 	private final String scope;
 	private final String question;
 	private final List<Option> options;
-//	private Option selected;
-
 	private Consumer<Option> listener;
+	private Group widget;
 
 	private OptionGroup(
 			String scope, String question, List<Option> options
@@ -27,7 +26,6 @@ class OptionGroup {
 		this.scope = scope;
 		this.question = question;
 		this.options = options;
-	//	selected = options.isEmpty() ? null : options.get(0);
 	}
 
 	static OptionGroup of(Scope group, String question) {
@@ -45,18 +43,19 @@ class OptionGroup {
 	void onSelect(Consumer<Option> fn) {
 		this.listener = fn;
 	}
-//	Option selected() {
-//		return selected;
-//	}
+
+	Group widget() {
+		return widget;
+	}
 
 	OptionGroup renderOn(Composite comp) {
-		var group = new Group(comp, SWT.NONE);
-		UI.fillHorizontal(group);
-		group.setText(scope);
-		UI.gridLayout(group, 1);
-		UI.label(group, question);
+		widget = new Group(comp, SWT.NONE);
+		UI.fillHorizontal(widget);
+		widget.setText(scope);
+		UI.gridLayout(widget, 1);
+		UI.label(widget, question);
 		for (var opt : options) {
-			var btn = new Button(group, SWT.RADIO);
+			var btn = new Button(widget, SWT.RADIO);
 			btn.setSelection(false);
 			btn.setText(opt.label());
 			Controls.onSelect(btn, e -> {

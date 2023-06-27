@@ -20,7 +20,8 @@ final class Sh2e {
 		END_OF_LIFE("End of life", EndOfLife.values()),
 		CAPITAL_GOODS("Capital goods", CapitalGoods.values()),
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
-		THRESHOLD("Threshold and loops", Threshold.values());
+		THRESHOLD("Threshold and loops", Threshold.values()),
+		BOUNDARIES("System boundaries", Boundaries.values());
 
 		private final String label;
 		private final Option[] options;
@@ -149,11 +150,13 @@ final class Sh2e {
 
 	public enum EndOfLife implements Option {
 
-		CUTOFF("Cut-off"),
+		CUTOFF("Cut-off approach"),
 
-		AVOIDED("Avoided burden approach"),
+		AVOIDED("Recycling approach"),
 
-		CIRCULAR("Circular footprint formula");
+		CIRCULAR("Circular footprint formula"),
+
+		OTHER("Other approach, please state");
 
 		private final String label;
 
@@ -225,6 +228,29 @@ final class Sh2e {
 		}
 
 		public static Optional<Threshold> of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
+	public enum Boundaries implements Option {
+
+		PRODUCTION("Hydrogen production"),
+
+		USE("Hydrogen use"),
+
+		NONE("Hydrogen production and use");
+
+		private final String label;
+
+		Boundaries(String label) {
+			this.label = label;
+		}
+
+		public static Optional<Boundaries> of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 

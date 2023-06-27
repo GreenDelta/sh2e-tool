@@ -17,16 +17,21 @@ class TemplateWizard extends Wizard {
 
 	final EnumMap<Scope, Option> selection = new EnumMap<>(Scope.class);
 
+	private StartPage startPage;
+	private WizModellingPage modellingPage;
+	private WizProspectivityPage prospectivityPage;
+	private WizBoundariesPage boundariesPage;
+	private WizTemplatePage templatePage;
+
 	private TemplateWizard() {
 		setNeedsProgressMonitor(true);
 		setWindowTitle("FCH-LCA tool");
-		setForcePreviousAndNextButtons(true);
 	}
 
 	static void open() {
 		var wizard = new TemplateWizard();
 		var dialog = new WizardDialog(UI.shell(), wizard);
-		dialog.setPageSize(250, 150);
+		// dialog.setPageSize(250, 250);
 		dialog.open();
 	}
 
@@ -37,16 +42,32 @@ class TemplateWizard extends Wizard {
 
 	@Override
 	public void addPages() {
-		addPage(new StartPage(this));
+		startPage = new StartPage(this);
+		modellingPage = new WizModellingPage(this);
+		prospectivityPage = new WizProspectivityPage();
+		boundariesPage = new WizBoundariesPage();
+		templatePage = new WizTemplatePage(this);
+		addPage(startPage);
+		addPage(modellingPage);
+		addPage(prospectivityPage);
+		addPage(boundariesPage);
+		addPage(templatePage);
 	}
 
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		if (!selection.containsKey(Scope.MODELLING))
-			return new WizModellingPage(this);
+			return modellingPage;
+		if (page == modellingPage)
+			return prospectivityPage;
+		if (page == prospectivityPage)
+			return boundariesPage;
+		if (page == boundariesPage)
+			return templatePage;
+
 		return page instanceof WizTemplatePage
 				? null
-				: new WizTemplatePage(this);
+				: templatePage;
 	}
 
 	private static class StartPage extends WizardPage {
@@ -60,19 +81,12 @@ class TemplateWizard extends Wizard {
 			setDescription("To get through this dialog, " +
 					"it is recommended that you refer to the " +
 					"SH2E guidelines for clarification.");
-			setPageComplete(true);
+			setPageComplete(false);
 		}
 
 		@Override
 		public IWizardPage getNextPage() {
-			return !wizard.selection.containsKey(Scope.MODELLING)
-					? new WizModellingPage(wizard)
-					: new WizTemplatePage(wizard);
-		}
-
-		@Override
-		public boolean canFlipToNextPage() {
-			return true;
+			return wizard.getNextPage(this);
 		}
 
 		@Override
@@ -88,6 +102,7 @@ class TemplateWizard extends Wizard {
 					Option.Yes, Option.No
 			);
 			group.renderOn(body).onSelect(option -> {
+				setPageComplete(true);
 				if (option.equals(Option.No)) {
 					wizard.selection.put(
 							Scope.APPLICATION, Application.ACCOUNTING);
