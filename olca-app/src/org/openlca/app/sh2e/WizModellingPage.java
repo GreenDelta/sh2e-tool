@@ -5,20 +5,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.openlca.app.sh2e.Sh2e.Application;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
-import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.UI;
-
-import java.util.function.IntConsumer;
 
 class WizModellingPage extends WizardPage {
 
-	private final TemplateWizard wizard;
+	private Option scaleOption;
+	private Option modellingOption;
 
-	WizModellingPage(TemplateWizard wizard) {
+	WizModellingPage() {
 		super("WizModellingPage");
-		this.wizard = wizard;
 		setTitle("Modelling principles");
 		setPageComplete(false);
+	}
+
+	public Option application() {
+		return scaleOption;
+	}
+
+	public Option modelling() {
+		return modellingOption;
 	}
 
 	@Override
@@ -27,21 +32,16 @@ class WizModellingPage extends WizardPage {
 		UI.gridLayout(body, 1);
 		setControl(body);
 
-		var _checked = new boolean[2];
-		IntConsumer checked = group -> {
-			_checked[group] = true;
-			if (_checked[0] && _checked[1]) {
-				setPageComplete(true);
-			}
-		};
+		Runnable checkState = () -> setPageComplete(
+				scaleOption != null && modellingOption != null);
 
 		var scaleGroup = OptionGroup.of(
 				"Scale",
 				"What is the scale of the decision support?",
 				Application.MICRO, Application.MACRO);
 		scaleGroup.renderOn(body).onSelect(option -> {
-			checked.accept(0);
-			wizard.selection.put(Scope.APPLICATION, option);
+			scaleOption = option;
+			checkState.run();
 		});
 
 		var statusGroup = OptionGroup.of(
@@ -50,12 +50,10 @@ class WizModellingPage extends WizardPage {
 						"this change be modelled with a net benefit?",
 				Option.Yes, Option.No);
 		statusGroup.renderOn(body).onSelect(option -> {
-			checked.accept(1);
-			if (option.equals(Option.Yes)) {
-				wizard.selection.put(Scope.MODELLING, Modelling.CONSEQUENTIAL);
-			} else {
-				wizard.selection.put(Scope.MODELLING, Modelling.ATTRIBUTIONAL);
-			}
+			modellingOption = option.equals(Option.Yes)
+					? Modelling.CONSEQUENTIAL
+					: Modelling.ATTRIBUTIONAL;
+			checkState.run();
 		});
 	}
 }
