@@ -16,7 +16,7 @@ class WizBoundariesPage extends WizardPage {
 		setPageComplete(false);
 	}
 
-	Option selected() {
+	Option boundaries() {
 		return selected;
 	}
 

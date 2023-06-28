@@ -15,6 +15,7 @@ class TemplateWizard extends Wizard {
 	private WizModellingPage modellingPage;
 	private WizProspectivityPage prospectivityPage;
 	private WizBoundariesPage boundariesPage;
+	private WizEndOfLifePage endOfLifePage;
 	private WizTemplatePage templatePage;
 
 	private TemplateWizard() {
@@ -40,11 +41,13 @@ class TemplateWizard extends Wizard {
 		modellingPage = new WizModellingPage();
 		prospectivityPage = new WizProspectivityPage();
 		boundariesPage = new WizBoundariesPage();
+		endOfLifePage = new WizEndOfLifePage();
 		templatePage = new WizTemplatePage(this);
 		addPage(startPage);
 		addPage(modellingPage);
 		addPage(prospectivityPage);
 		addPage(boundariesPage);
+		addPage(endOfLifePage);
 		addPage(templatePage);
 	}
 
@@ -59,6 +62,9 @@ class TemplateWizard extends Wizard {
 			settings.put(Scope.MODELLING, modellingPage.modelling());
 		}
 
+		settings.put(Scope.PROSPECTIVITY, prospectivityPage.prospectivity());
+		settings.put(Scope.BOUNDARIES, boundariesPage.boundaries());
+		settings.put(Scope.END_OF_LIFE, endOfLifePage.endOfLife());
 		return settings;
 	}
 
@@ -67,14 +73,15 @@ class TemplateWizard extends Wizard {
 		if (page instanceof WizStartPage sp) {
 			return Option.Yes.equals(sp.isDecisionSupport())
 					? modellingPage
-					: boundariesPage;
+					: prospectivityPage;
 		}
-
 		if (page == modellingPage)
 			return prospectivityPage;
 		if (page == prospectivityPage)
 			return boundariesPage;
 		if (page == boundariesPage)
+			return endOfLifePage;
+		if (page == endOfLifePage)
 			return templatePage;
 
 		return page instanceof WizTemplatePage
