@@ -202,9 +202,9 @@ final class Sh2e {
 
 	public enum RiskAssessment implements Option {
 
-		INCLUDED("Included"),
+		INCLUDED("Risk based processes included"),
 
-		EXCLUDED("Excluded");
+		EXCLUDED("Simple LCA, without risk assessment");
 
 		private final String label;
 

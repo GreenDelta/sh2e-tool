@@ -3,28 +3,45 @@ package org.openlca.app.sh2e;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.openlca.app.db.Database;
 import org.openlca.app.sh2e.Sh2e.Application;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Scope;
+import org.openlca.app.util.MsgBox;
 import org.openlca.app.util.UI;
+import org.openlca.core.database.IDatabase;
 
 class TemplateWizard extends Wizard {
+
+	private final IDatabase db;
 
 	private WizStartPage startPage;
 	private WizModellingPage modellingPage;
 	private WizProspectivityPage prospectivityPage;
 	private WizBoundariesPage boundariesPage;
 	private WizEndOfLifePage endOfLifePage;
+	private WizCapitalGoodsPage capitalGoodsPage;
+	private WizRiskAssessmentPage riskAssessmentPage;
 	private WizTemplatePage templatePage;
 
-	private TemplateWizard() {
+	private TemplateWizard(IDatabase db) {
+		this.db = db;
 		setNeedsProgressMonitor(true);
 		setWindowTitle("FCH-LCA tool");
 	}
 
 	static void open() {
-		var wizard = new TemplateWizard();
+		var db = Database.get();
+		if (db == null) {
+			MsgBox.info(
+					"Please create or open a database first",
+					"Before you can start, you need to create " +
+							"or open a database in the navigation panel " +
+							"on the left side first.");
+			return;
+		}
+		var wizard = new TemplateWizard(db);
 		var dialog = new WizardDialog(UI.shell(), wizard);
 		// dialog.setPageSize(250, 250);
 		dialog.open();
@@ -42,12 +59,16 @@ class TemplateWizard extends Wizard {
 		prospectivityPage = new WizProspectivityPage();
 		boundariesPage = new WizBoundariesPage();
 		endOfLifePage = new WizEndOfLifePage();
+		capitalGoodsPage = new WizCapitalGoodsPage();
+		riskAssessmentPage = new WizRiskAssessmentPage();
 		templatePage = new WizTemplatePage(this);
 		addPage(startPage);
 		addPage(modellingPage);
 		addPage(prospectivityPage);
 		addPage(boundariesPage);
 		addPage(endOfLifePage);
+		addPage(capitalGoodsPage);
+		addPage(riskAssessmentPage);
 		addPage(templatePage);
 	}
 
@@ -65,6 +86,8 @@ class TemplateWizard extends Wizard {
 		settings.put(Scope.PROSPECTIVITY, prospectivityPage.prospectivity());
 		settings.put(Scope.BOUNDARIES, boundariesPage.boundaries());
 		settings.put(Scope.END_OF_LIFE, endOfLifePage.endOfLife());
+		settings.put(Scope.CAPITAL_GOODS, capitalGoodsPage.capitalGoods());
+		settings.put(Scope.RISK_ASSESSMENT, riskAssessmentPage.riskAssessment());
 		return settings;
 	}
 
@@ -82,6 +105,10 @@ class TemplateWizard extends Wizard {
 		if (page == boundariesPage)
 			return endOfLifePage;
 		if (page == endOfLifePage)
+			return capitalGoodsPage;
+		if (page == capitalGoodsPage)
+			return riskAssessmentPage;
+		if(page == riskAssessmentPage)
 			return templatePage;
 
 		return page instanceof WizTemplatePage
