@@ -56,28 +56,38 @@ public class StartPage extends SimpleFormEditor {
 
 			texts.add(
 					"""
-							<p><b>Welcome to the sh2e-tool</b></p>
+							<p><b>Welcome to the FCH-LCA tool</b></p>
 							<p>
-							Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
-							eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-							voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
-							clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-							amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-							nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-							sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-							Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-							sit amet.
+							Designed to support LCA practitioners, the FCH-LCA tool is a
+							powerful solution that enables precise calculations of
+							environmental LCA, social LCA, and Life Cycle Costing, all in
+							accordance with the comprehensively developed SH2E guidelines.
+							Our objective is to facilitate the application of these
+							meticulously developed guidelines, ensuring the production of
+							consistent and reliable results that can be readily interpreted
+							and compared across various hydrogen systems. The FCH-LCA tool
+							offers pre-set templates to streamline the initiation of projects,
+							while also providing flexibility for modelers to create their own
+							intrinsic models tailored to their specific case studies. With the
+							FCH-LCA tool, LCA practitioners can confidently analyze the
+							sustainability impact of hydrogen projects, saving time and effort
+							by leveraging industry best practices and established benchmarks.
 							</p>
 							""".strip());
 
 			var templateText = texts.add("""
 					<p><b>Product system templates</b></p>
 					<p>
-						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
-						eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-						voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
-						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit.
-						<a href="#">Click here to create a product system from a template.</a>
+					    The FCH-LCA tool provides a range pf pre-set templates tailored
+					    specifically for hydrogen production and use, catering to various
+					    scenarios and applications. These templates reflect the various
+					    system configurations recommended by the SH2E guidelines,
+					    encompassing crucial considerations such as system boundaries,
+					    allocation methods, and end-of-life modeling decisions. The
+					    templates aim to provide an overview of the main combinations and
+					    a core life cycle structure for possible hydrogen systems to be
+					    populated with data by users.
+						  <a href="#">Click here to start.</a>
 					</p>
 					""");
 			templateText.addHyperlinkListener(new HyperlinkAdapter() {
