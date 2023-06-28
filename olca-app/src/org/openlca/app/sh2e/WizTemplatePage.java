@@ -34,7 +34,7 @@ class WizTemplatePage extends WizardPage {
 		UI.gridLayout(body, 1);
 		setControl(body);
 
-		var top = UI.composite(parent);
+		var top = UI.composite(body);
 		UI.fillHorizontal(top);
 		UI.gridLayout(top, 2, 10, 0);
 		var text = UI.labeledText(top, "Category");

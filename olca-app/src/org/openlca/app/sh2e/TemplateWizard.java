@@ -4,12 +4,14 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.openlca.app.App;
+import org.openlca.app.db.Cache;
 import org.openlca.app.db.Database;
 import org.openlca.app.navigation.Navigator;
 import org.openlca.app.sh2e.Sh2e.Application;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Scope;
+import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.MsgBox;
 import org.openlca.app.util.UI;
 import org.openlca.core.database.IDatabase;
@@ -54,13 +56,23 @@ class TemplateWizard extends Wizard {
 		if (template == null)
 			return false;
 		var category = templatePage.category();
-		var system = new TemplateImport(template, category, db)
-				.run()
-				.orElse(null);
-		if (system == null)
-			return false;
-		Navigator.refresh();
-		App.open(system);
+		try {
+			getContainer().run(true, false, monitor -> {
+				var system = new TemplateImport(template, category, db)
+						.run()
+						.orElse(null);
+				if (system == null)
+					return;
+				system.writeOtherProperties(settings().toJson());
+				system = db.update(system);
+				App.open(system);
+			});
+		} catch (Exception e) {
+			ErrorReporter.on("Template import failed", e);
+		} finally {
+			Navigator.refresh();
+			Cache.evictAll();
+		}
 		return true;
 	}
 
@@ -84,9 +96,8 @@ class TemplateWizard extends Wizard {
 		addPage(templatePage);
 	}
 
-	OptionSettings settings() {
+	private OptionSettings settings() {
 		var settings = new OptionSettings();
-
 		if (Option.No.equals(startPage.isDecisionSupport())) {
 			settings.put(Scope.APPLICATION, Application.ACCOUNTING);
 			settings.put(Scope.MODELLING, Modelling.ATTRIBUTIONAL);
@@ -127,5 +138,4 @@ class TemplateWizard extends Wizard {
 				? null
 				: templatePage;
 	}
-
 }
