@@ -53,7 +53,7 @@ class WizEndOfLifePage extends WizardPage {
 	private void eval(Text text) {
 		var msg = text.getText().strip();
 		if (Strings.notEmpty(msg)) {
-			selected = Option.other(msg);
+			selected = Option.from(msg);
 			setPageComplete(true);
 		} else {
 			selected = null;
