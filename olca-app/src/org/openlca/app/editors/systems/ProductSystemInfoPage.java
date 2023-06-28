@@ -13,6 +13,7 @@ import org.openlca.app.editors.InfoSection;
 import org.openlca.app.editors.ModelPage;
 import org.openlca.app.editors.comments.CommentControl;
 import org.openlca.app.rcp.images.Icon;
+import org.openlca.app.sh2e.SH2EditorSection;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.UI;
@@ -48,6 +49,7 @@ public class ProductSystemInfoPage extends ModelPage<ProductSystem> {
 		info.render(body, tk);
 		addCalculationButton(info.composite(), tk);
 		createReferenceSection(body, tk);
+		SH2EditorSection.of(getModel()).renderOn(body, tk);
 		body.setFocus();
 		form.reflow(true);
 	}
