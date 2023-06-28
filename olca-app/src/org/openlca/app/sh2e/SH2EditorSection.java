@@ -1,12 +1,10 @@
 package org.openlca.app.sh2e;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.UI;
 import org.openlca.core.model.ProductSystem;
-
 
 public class SH2EditorSection {
 
@@ -21,11 +19,12 @@ public class SH2EditorSection {
 	}
 
 	public void renderOn(Composite body, FormToolkit tk) {
+		var settings = OptionSettings.readFrom(system.readOtherProperties());
 		var comp = UI.formSection(body, tk, "FCH-LCA Properties");
 		for (var scope : Scope.values()) {
-			UI.labeledText(comp, tk, scope.label(), SWT.READ_ONLY);
+			var text = UI.labeledText(comp, tk, scope.label());
+			text.setEditable(false);
+			text.setText(settings.get(scope).label());
 		}
 	}
-
-
 }

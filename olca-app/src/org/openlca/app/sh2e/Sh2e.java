@@ -1,20 +1,30 @@
 package org.openlca.app.sh2e;
 
+import org.openlca.util.Strings;
+
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 final class Sh2e {
 
 	public interface Option {
 		String label();
-		Option Yes = () -> "Yes";
-		Option No = () -> "No";
+		Option Yes = new SimpleOption("Yes");
+		Option No = new SimpleOption("No");
+		Option Empty = new SimpleOption("--");
 
-		static Option other(String label) {
-			return new OtherOption(label);
+		static Option from(String label) {
+			if (Strings.nullOrEmpty(label))
+				return Empty;
+			var s = label.strip().toLowerCase(Locale.US);
+			return switch (s) {
+				case "yes" -> Yes;
+				case "no" -> No;
+				default -> new SimpleOption(s);
+			};
 		}
-
-		record OtherOption(String label) implements Option {};
+		record SimpleOption(String label) implements Option {};
 	}
 
 	public enum Scope {
@@ -22,11 +32,9 @@ final class Sh2e {
 		APPLICATION("Intended application", Application.values()),
 		MODELLING("Modelling principles", Modelling.values()),
 		PROSPECTIVITY("Prospectivity", Prospectivity.values()),
-		SCALING("Scaling and learning curves", Scaling.values()),
 		END_OF_LIFE("End-of-life", EndOfLife.values()),
 		CAPITAL_GOODS("Capital goods", CapitalGoods.values()),
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
-		THRESHOLD("Threshold and loops", Threshold.values()),
 		BOUNDARIES("System boundaries", Boundaries.values());
 
 		private final String label;
@@ -56,16 +64,14 @@ final class Sh2e {
 		}
 	}
 
-	private static <E extends Option> Optional<E> optionOf(
-			String label, E[] options
-	) {
+	static Option optionOf(String label, Option[] options) {
 		if (label == null)
-			return Optional.empty();
+			return Option.Empty;
 		for (var opt : options) {
 			if (label.equals(opt.label()))
-				return Optional.of(opt);
+				return opt;
 		}
-		return Optional.empty();
+		return Option.from(label);
 	}
 
 	public enum Application implements Option {
@@ -82,7 +88,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<Application> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
@@ -103,7 +109,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<Modelling> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
@@ -124,28 +130,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<Prospectivity> of(String label) {
-			return Sh2e.optionOf(label, values());
-		}
-
-		public String label() {
-			return label;
-		}
-	}
-
-	public enum Scaling implements Option {
-
-		INCLUDED("Included"),
-
-		EXCLUDED("Excluded");
-
-		private final String label;
-
-		Scaling(String label) {
-			this.label = label;
-		}
-
-		public static Optional<Scaling> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
@@ -170,7 +155,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<EndOfLife> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
@@ -191,7 +176,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<CapitalGoods> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
@@ -212,28 +197,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<RiskAssessment> of(String label) {
-			return Sh2e.optionOf(label, values());
-		}
-
-		public String label() {
-			return label;
-		}
-	}
-
-	public enum Threshold implements Option {
-
-		INCLUDED("Included"),
-
-		EXCLUDED("Excluded");
-
-		private final String label;
-
-		Threshold(String label) {
-			this.label = label;
-		}
-
-		public static Optional<Threshold> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
@@ -256,7 +220,7 @@ final class Sh2e {
 			this.label = label;
 		}
 
-		public static Optional<Boundaries> of(String label) {
+		public static Option of(String label) {
 			return Sh2e.optionOf(label, values());
 		}
 
