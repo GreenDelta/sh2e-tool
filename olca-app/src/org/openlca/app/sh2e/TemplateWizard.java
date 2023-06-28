@@ -3,7 +3,9 @@ package org.openlca.app.sh2e;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.openlca.app.App;
 import org.openlca.app.db.Database;
+import org.openlca.app.navigation.Navigator;
 import org.openlca.app.sh2e.Sh2e.Application;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
@@ -43,13 +45,23 @@ class TemplateWizard extends Wizard {
 		}
 		var wizard = new TemplateWizard(db);
 		var dialog = new WizardDialog(UI.shell(), wizard);
-		// dialog.setPageSize(250, 250);
 		dialog.open();
 	}
 
 	@Override
 	public boolean performFinish() {
-		return false;
+		var template = templatePage.template();
+		if (template == null)
+			return false;
+		var category = templatePage.category();
+		var system = new TemplateImport(template, category, db)
+				.run()
+				.orElse(null);
+		if (system == null)
+			return false;
+		Navigator.refresh();
+		App.open(system);
+		return true;
 	}
 
 	@Override
@@ -61,7 +73,7 @@ class TemplateWizard extends Wizard {
 		endOfLifePage = new WizEndOfLifePage();
 		capitalGoodsPage = new WizCapitalGoodsPage();
 		riskAssessmentPage = new WizRiskAssessmentPage();
-		templatePage = new WizTemplatePage(this);
+		templatePage = new WizTemplatePage();
 		addPage(startPage);
 		addPage(modellingPage);
 		addPage(prospectivityPage);
