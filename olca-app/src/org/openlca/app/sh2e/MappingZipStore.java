@@ -5,6 +5,7 @@ import org.openlca.core.model.ModelType;
 import org.openlca.jsonld.Json;
 import org.openlca.jsonld.JsonStoreReader;
 import org.openlca.jsonld.ZipStore;
+import org.openlca.util.Strings;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,7 @@ class MappingZipStore implements JsonStoreReader, AutoCloseable {
 
 	private boolean skip(ModelType type) {
 		return type != ModelType.PROCESS
-			&& type != ModelType.PRODUCT_SYSTEM;
+				&& type != ModelType.PRODUCT_SYSTEM;
 	}
 
 	@Override
@@ -54,8 +55,8 @@ class MappingZipStore implements JsonStoreReader, AutoCloseable {
 		if (skip(type) || origin.isEmpty())
 			return origin;
 		var list = origin.stream()
-			.map(this::mapIfAbsent)
-			.toList();
+				.map(this::mapIfAbsent)
+				.toList();
 		if (!list.isEmpty() && type == ModelType.PRODUCT_SYSTEM) {
 			mappedSystemId = list.get(0);
 		}
@@ -83,8 +84,8 @@ class MappingZipStore implements JsonStoreReader, AutoCloseable {
 	@Override
 	public List<String> getBinFiles(ModelType type, String refId) {
 		return skip(type)
-			? zip.getBinFiles(type, refId)
-			: zip.getBinFiles(type, originalIdOf(refId));
+				? zip.getBinFiles(type, refId)
+				: zip.getBinFiles(type, originalIdOf(refId));
 	}
 
 	@Override
@@ -96,12 +97,21 @@ class MappingZipStore implements JsonStoreReader, AutoCloseable {
 			return null;
 
 		swapIdOf(obj);
-		Json.put(obj, "category", category);
+
+		// set a possible top-category
+		if (Strings.notEmpty(category)) {
+			var c = Json.getString(obj, "category");
+			var path = Strings.notEmpty(c)
+					? category + "/" + c
+					: category;
+			Json.put(obj, "category", path);
+		}
+
 		if (type == ModelType.PRODUCT_SYSTEM) {
 			mapSystemRefs(obj);
 		} else {
 			Json.forEachObject(obj, "exchanges",
-				e -> swapIdOf(Json.getObject(e, "defaultProvider")));
+					e -> swapIdOf(Json.getObject(e, "defaultProvider")));
 		}
 		return obj;
 	}
@@ -114,8 +124,8 @@ class MappingZipStore implements JsonStoreReader, AutoCloseable {
 			swapIdOf(Json.getObject(link, "provider"));
 		});
 		Json.forEachObject(obj, "parameterSets",
-			set -> Json.forEachObject(set, "parameters",
-				param -> swapIdOf(Json.getObject(param, "context"))));
+				set -> Json.forEachObject(set, "parameters",
+						param -> swapIdOf(Json.getObject(param, "context"))));
 	}
 
 	private void swapIdOf(JsonObject obj) {
