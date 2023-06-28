@@ -18,12 +18,16 @@ class WizModellingPage extends WizardPage {
 		setPageComplete(false);
 	}
 
-	public Option application() {
+	Option application() {
 		return scaleOption;
 	}
 
-	public Option modelling() {
+	Option modelling() {
 		return modellingOption;
+	}
+
+	void skip() {
+		setPageComplete(true);
 	}
 
 	@Override

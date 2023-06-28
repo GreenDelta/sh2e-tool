@@ -116,10 +116,13 @@ class TemplateWizard extends Wizard {
 
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
-		if (page instanceof WizStartPage sp) {
-			return Option.Yes.equals(sp.isDecisionSupport())
-					? modellingPage
-					: prospectivityPage;
+		if (page == startPage) {
+			if (Option.Yes.equals(startPage.isDecisionSupport())) {
+				return modellingPage;
+			} else {
+				modellingPage.skip();
+				return prospectivityPage;
+			}
 		}
 		if (page == modellingPage)
 			return prospectivityPage;
@@ -131,7 +134,7 @@ class TemplateWizard extends Wizard {
 			return capitalGoodsPage;
 		if (page == capitalGoodsPage)
 			return riskAssessmentPage;
-		if(page == riskAssessmentPage)
+		if (page == riskAssessmentPage)
 			return templatePage;
 
 		return page instanceof WizTemplatePage
