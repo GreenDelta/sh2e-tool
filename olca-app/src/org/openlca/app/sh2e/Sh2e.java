@@ -9,6 +9,12 @@ final class Sh2e {
 		String label();
 		Option Yes = () -> "Yes";
 		Option No = () -> "No";
+
+		static Option other(String label) {
+			return new OtherOption(label);
+		}
+
+		record OtherOption(String label) implements Option {};
 	}
 
 	public enum Scope {
@@ -17,7 +23,7 @@ final class Sh2e {
 		MODELLING("Modelling principles", Modelling.values()),
 		PROSPECTIVITY("Prospectivity", Prospectivity.values()),
 		SCALING("Scaling and learning curves", Scaling.values()),
-		END_OF_LIFE("End of life", EndOfLife.values()),
+		END_OF_LIFE("End-of-life", EndOfLife.values()),
 		CAPITAL_GOODS("Capital goods", CapitalGoods.values()),
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
 		THRESHOLD("Threshold and loops", Threshold.values()),

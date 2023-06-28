@@ -16,7 +16,7 @@ class WizProspectivityPage extends WizardPage {
 		setPageComplete(false);
 	}
 
-	Option selected() {
+	Option prospectivity() {
 		return selected;
 	}
 
