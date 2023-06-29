@@ -12,7 +12,7 @@ public final class Config {
 	/**
 	 * The name of the application that is shown to the user.
 	 */
-	public static final String APPLICATION_NAME = "sh2e-tool";
+	public static final String APPLICATION_NAME = "FCH-LCA";
 
 	/**
 	 * The name of the workspace folder. This folder is located in the user

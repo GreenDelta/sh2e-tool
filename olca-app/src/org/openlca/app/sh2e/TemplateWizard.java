@@ -122,9 +122,10 @@ class TemplateWizard extends Wizard {
 	public IWizardPage getNextPage(IWizardPage page) {
 		if (page == startPage) {
 			if (Option.Yes.equals(startPage.isDecisionSupport())) {
+				modellingPage.setPageComplete(false);
 				return modellingPage;
 			} else {
-				modellingPage.skip();
+				modellingPage.setPageComplete(true);
 				return prospectivityPage;
 			}
 		}

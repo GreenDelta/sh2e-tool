@@ -21,7 +21,7 @@ final class Sh2e {
 			return switch (s) {
 				case "yes" -> Yes;
 				case "no" -> No;
-				default -> new SimpleOption(s);
+				default -> new SimpleOption(label);
 			};
 		}
 		record SimpleOption(String label) implements Option {};

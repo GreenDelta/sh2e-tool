@@ -26,10 +26,6 @@ class WizModellingPage extends WizardPage {
 		return modellingOption;
 	}
 
-	void skip() {
-		setPageComplete(true);
-	}
-
 	@Override
 	public void createControl(Composite parent) {
 		var body = UI.composite(parent);
