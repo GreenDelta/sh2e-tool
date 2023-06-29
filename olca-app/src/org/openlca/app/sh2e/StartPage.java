@@ -106,7 +106,7 @@ public class StartPage extends SimpleFormEditor {
 			label.setLayoutData(new GridData(
 					SWT.CENTER, SWT.TOP, true, false));
 
-			var banner = getClass().getResourceAsStream("banner.png");
+			var banner = getClass().getResourceAsStream("banner.jpg");
 			if (banner == null)
 				return label;
 			try (banner) {
