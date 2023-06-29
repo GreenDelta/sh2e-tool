@@ -37,6 +37,7 @@ import org.openlca.app.navigation.actions.ExportAction;
 import org.openlca.app.navigation.actions.NavigationMenu;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.rcp.images.Images;
+import org.openlca.app.sh2e.Sh2eToolBar;
 import org.openlca.app.sh2e.StartPage;
 import org.openlca.app.tools.libraries.LibraryExportDialog;
 import org.openlca.app.tools.mapping.MappingTool;
@@ -77,6 +78,7 @@ public class RcpActionBarAdvisor extends ActionBarAdvisor {
 		toolbar.add(saveAction);
 		toolbar.add(saveAsAction);
 		toolbar.add(saveAllAction);
+		toolbar.add(Sh2eToolBar.getAction());
 		coolBar.add(toolbar);
 	}
 
