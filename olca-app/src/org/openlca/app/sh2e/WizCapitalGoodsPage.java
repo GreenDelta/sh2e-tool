@@ -44,6 +44,7 @@ class WizCapitalGoodsPage extends WizardPage {
 			if (Option.No.equals(option)) {
 				selected = CapitalGoods.INCLUDED;
 				setPageComplete(true);
+				text.setEnabled(false);
 			} else {
 				text.setEnabled(true);
 				eval(text);

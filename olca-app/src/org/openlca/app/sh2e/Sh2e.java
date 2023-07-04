@@ -39,7 +39,8 @@ final class Sh2e {
 		CAPITAL_GOODS("Capital goods", CapitalGoods.values()),
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
 		BOUNDARIES("System boundaries", Boundaries.values()),
-		TECHNOLOGY_LEVEL("Technology readiness level", TechnologyLevel.values());
+		TECHNOLOGY_LEVEL("Technology readiness level", TechnologyLevel.values()),
+		CRADLE_TO_GATE("Boundary of hydrogen production", CradleToGate.values());
 
 		private final String label;
 		private final Option[] options;
@@ -248,6 +249,30 @@ final class Sh2e {
 		private final String label;
 
 		TechnologyLevel(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
+	public enum CradleToGate implements Option {
+
+		C2G_1("Cradle-to-gate 1"),
+		C2G_2("Cradle-to-gate 2"),
+		C2G_3("Cradle-to-gate 3"),
+		C2G_4("Cradle-to-gate 4"),
+		C2G_5("Cradle-to-gate 5"),
+		C2G_6("Cradle-to-gate 6");
+
+		private final String label;
+
+		CradleToGate(String label) {
 			this.label = label;
 		}
 
