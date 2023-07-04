@@ -10,6 +10,7 @@ final class Sh2e {
 
 	public interface Option {
 		String label();
+
 		Option Yes = new SimpleOption("Yes");
 		Option No = new SimpleOption("No");
 		Option Empty = new SimpleOption("--");
@@ -24,7 +25,9 @@ final class Sh2e {
 				default -> new SimpleOption(label);
 			};
 		}
-		record SimpleOption(String label) implements Option {};
+
+		record SimpleOption(String label) implements Option {
+		}
 	}
 
 	public enum Scope {
@@ -35,7 +38,8 @@ final class Sh2e {
 		END_OF_LIFE("End-of-life", EndOfLife.values()),
 		CAPITAL_GOODS("Capital goods", CapitalGoods.values()),
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
-		BOUNDARIES("System boundaries", Boundaries.values());
+		BOUNDARIES("System boundaries", Boundaries.values()),
+		TECHNOLOGY_LEVEL("Technology readiness level", TechnologyLevel.values());
 
 		private final String label;
 		private final Option[] options;
@@ -217,6 +221,33 @@ final class Sh2e {
 		private final String label;
 
 		Boundaries(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
+	public enum TechnologyLevel implements Option {
+
+		TRL_1("TRL 1 - basic principles observed"),
+		TRL_2("TRL 2 - technology concept formulated"),
+		TRL_3("TRL 3 - experimental proof of concept"),
+		TRL_4("TRL 4 - technology validated in lab"),
+		TRL_5("TRL 5 - technology validated in relevant environment"),
+		TRL_6("TRL 6 - technology demonstrated in relevant environment"),
+		TRL_7("TRL 7 - system prototype demonstration in operational environment"),
+		TRL_8("TRL 8 - system complete and qualified"),
+		TRL_9("TRL 9 - actual system proven in operational environment");
+
+		private final String label;
+
+		TechnologyLevel(String label) {
 			this.label = label;
 		}
 
