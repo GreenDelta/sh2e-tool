@@ -63,6 +63,13 @@ class TemplateWizard extends Wizard {
 		var template = templatePage.template();
 		if (template == null)
 			return false;
+		if (template.file() == null) {
+			MsgBox.info(
+					"Not yet available",
+					"The selected template is not yet available");
+			return false;
+		}
+
 		var category = templatePage.category();
 		try {
 			getContainer().run(true, false, monitor -> {
@@ -157,6 +164,7 @@ class TemplateWizard extends Wizard {
 			return boundariesPage;
 
 		if (page == boundariesPage) {
+			templatePage.setFilter(boundariesPage.boundaries());
 			if (boundariesPage.boundaries() == Boundaries.USE) {
 				cradleToGatePage.setPageComplete(true);
 				return endOfLifePage;
