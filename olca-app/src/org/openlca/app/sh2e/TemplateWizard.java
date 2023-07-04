@@ -9,6 +9,7 @@ import org.openlca.app.db.Database;
 import org.openlca.app.navigation.Navigator;
 import org.openlca.app.rcp.RcpActivator;
 import org.openlca.app.sh2e.Sh2e.Application;
+import org.openlca.app.sh2e.Sh2e.Boundaries;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Prospectivity;
@@ -27,6 +28,7 @@ class TemplateWizard extends Wizard {
 	private WizProspectivityPage prospectivityPage;
 	private WizTechnologyLevelPage technologyPage;
 	private WizBoundariesPage boundariesPage;
+	private WizCradleToGatePage cradleToGatePage;
 	private WizEndOfLifePage endOfLifePage;
 	private WizCapitalGoodsPage capitalGoodsPage;
 	private WizRiskAssessmentPage riskAssessmentPage;
@@ -89,6 +91,7 @@ class TemplateWizard extends Wizard {
 		prospectivityPage = new WizProspectivityPage();
 		technologyPage = new WizTechnologyLevelPage();
 		boundariesPage = new WizBoundariesPage();
+		cradleToGatePage = new WizCradleToGatePage();
 		endOfLifePage = new WizEndOfLifePage();
 		capitalGoodsPage = new WizCapitalGoodsPage();
 		riskAssessmentPage = new WizRiskAssessmentPage();
@@ -98,6 +101,7 @@ class TemplateWizard extends Wizard {
 		addPage(prospectivityPage);
 		addPage(technologyPage);
 		addPage(boundariesPage);
+		addPage(cradleToGatePage);
 		addPage(endOfLifePage);
 		addPage(capitalGoodsPage);
 		addPage(riskAssessmentPage);
@@ -117,6 +121,7 @@ class TemplateWizard extends Wizard {
 		settings.put(Scope.PROSPECTIVITY, prospectivityPage.prospectivity());
 		settings.put(Scope.TECHNOLOGY_LEVEL, technologyPage.technologyLevel());
 		settings.put(Scope.BOUNDARIES, boundariesPage.boundaries());
+		settings.put(Scope.CRADLE_TO_GATE, cradleToGatePage.cradleToGate());
 		settings.put(Scope.END_OF_LIFE, endOfLifePage.endOfLife());
 		settings.put(Scope.CAPITAL_GOODS, capitalGoodsPage.capitalGoods());
 		settings.put(Scope.RISK_ASSESSMENT, riskAssessmentPage.riskAssessment());
@@ -150,7 +155,19 @@ class TemplateWizard extends Wizard {
 
 		if (page == technologyPage)
 			return boundariesPage;
-		if (page == boundariesPage)
+
+		if (page == boundariesPage) {
+			if (boundariesPage.boundaries() == Boundaries.USE) {
+				cradleToGatePage.setPageComplete(true);
+				return endOfLifePage;
+			} else {
+				cradleToGatePage.setPageComplete(
+						cradleToGatePage.cradleToGate() != null);
+				return cradleToGatePage;
+			}
+		}
+
+		if (page == cradleToGatePage)
 			return endOfLifePage;
 		if (page == endOfLifePage)
 			return capitalGoodsPage;
