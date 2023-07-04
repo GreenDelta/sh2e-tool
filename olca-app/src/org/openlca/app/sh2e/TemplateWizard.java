@@ -11,6 +11,7 @@ import org.openlca.app.rcp.RcpActivator;
 import org.openlca.app.sh2e.Sh2e.Application;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
+import org.openlca.app.sh2e.Sh2e.Prospectivity;
 import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.MsgBox;
@@ -24,6 +25,7 @@ class TemplateWizard extends Wizard {
 	private WizStartPage startPage;
 	private WizModellingPage modellingPage;
 	private WizProspectivityPage prospectivityPage;
+	private WizTechnologyLevelPage technologyPage;
 	private WizBoundariesPage boundariesPage;
 	private WizEndOfLifePage endOfLifePage;
 	private WizCapitalGoodsPage capitalGoodsPage;
@@ -85,6 +87,7 @@ class TemplateWizard extends Wizard {
 		startPage = new WizStartPage();
 		modellingPage = new WizModellingPage();
 		prospectivityPage = new WizProspectivityPage();
+		technologyPage = new WizTechnologyLevelPage();
 		boundariesPage = new WizBoundariesPage();
 		endOfLifePage = new WizEndOfLifePage();
 		capitalGoodsPage = new WizCapitalGoodsPage();
@@ -93,6 +96,7 @@ class TemplateWizard extends Wizard {
 		addPage(startPage);
 		addPage(modellingPage);
 		addPage(prospectivityPage);
+		addPage(technologyPage);
 		addPage(boundariesPage);
 		addPage(endOfLifePage);
 		addPage(capitalGoodsPage);
@@ -111,6 +115,7 @@ class TemplateWizard extends Wizard {
 		}
 
 		settings.put(Scope.PROSPECTIVITY, prospectivityPage.prospectivity());
+		settings.put(Scope.TECHNOLOGY_LEVEL, technologyPage.technologyLevel());
 		settings.put(Scope.BOUNDARIES, boundariesPage.boundaries());
 		settings.put(Scope.END_OF_LIFE, endOfLifePage.endOfLife());
 		settings.put(Scope.CAPITAL_GOODS, capitalGoodsPage.capitalGoods());
@@ -131,7 +136,19 @@ class TemplateWizard extends Wizard {
 		}
 		if (page == modellingPage)
 			return prospectivityPage;
-		if (page == prospectivityPage)
+
+		if (page == prospectivityPage) {
+			if (prospectivityPage.prospectivity() == Prospectivity.RETROSPECTIVE) {
+				technologyPage.setPageComplete(true);
+				return boundariesPage;
+			} else {
+				technologyPage.setPageComplete(
+						technologyPage.technologyLevel() != null);
+				return technologyPage;
+			}
+		}
+
+		if (page == technologyPage)
 			return boundariesPage;
 		if (page == boundariesPage)
 			return endOfLifePage;

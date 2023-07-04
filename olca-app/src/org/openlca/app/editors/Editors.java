@@ -70,6 +70,8 @@ public class Editors {
 					continue;
 				if (editor instanceof LogFileEditor)
 					continue;
+				if (editor instanceof org.openlca.app.sh2e.StartPage)
+					continue;
 
 				refs.add(ref);
 			}
