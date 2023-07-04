@@ -126,9 +126,13 @@ class TemplateWizard extends Wizard {
 		}
 
 		settings.put(Scope.PROSPECTIVITY, prospectivityPage.prospectivity());
-		settings.put(Scope.TECHNOLOGY_LEVEL, technologyPage.technologyLevel());
+		if (prospectivityPage.prospectivity() == Prospectivity.PROSPECTIVE) {
+			settings.put(Scope.TECHNOLOGY_LEVEL, technologyPage.technologyLevel());
+		}
 		settings.put(Scope.BOUNDARIES, boundariesPage.boundaries());
-		settings.put(Scope.CRADLE_TO_GATE, cradleToGatePage.cradleToGate());
+		if (boundariesPage.boundaries() != Boundaries.USE) {
+			settings.put(Scope.CRADLE_TO_GATE, cradleToGatePage.cradleToGate());
+		}
 		settings.put(Scope.END_OF_LIFE, endOfLifePage.endOfLife());
 		settings.put(Scope.CAPITAL_GOODS, capitalGoodsPage.capitalGoods());
 		settings.put(Scope.RISK_ASSESSMENT, riskAssessmentPage.riskAssessment());
