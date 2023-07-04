@@ -4,13 +4,21 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
+import org.openlca.app.sh2e.Sh2e.Boundaries;
+import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.UI;
+
+import java.util.ArrayList;
 
 class WizTemplatePage extends WizardPage {
 
 	private String category;
-	private Template template;
+	private Template selected;
+
+	private final ArrayList<Template> templates = new ArrayList<>();
+	private Boundaries filter;
+	private List list;
 
 	WizTemplatePage() {
 		super("WizTemplatePage");
@@ -20,12 +28,24 @@ class WizTemplatePage extends WizardPage {
 		setPageComplete(false);
 	}
 
+	void setFilter(Option option) {
+		Boundaries filter = null;
+		for (var b : Boundaries.values()) {
+			if (b == option) {
+				filter = b;
+				break;
+			}
+		}
+		this.filter = filter;
+		fillList();
+	}
+
 	public String category() {
 		return category;
 	}
 
 	public Template template() {
-		return template;
+		return selected;
 	}
 
 	@Override
@@ -42,24 +62,41 @@ class WizTemplatePage extends WizardPage {
 				e -> category = text.getText().strip());
 
 		UI.label(body, "Select a template:");
-		var list = new List(body, SWT.BORDER);
+		list = new List(body, SWT.BORDER);
 		UI.gridData(list, true, true);
-		var templates = Template.values();
-		var items = new String[templates.length];
-		for (int i = 0; i < templates.length; i++) {
-			items[i] = templates[i].label();
-		}
-		list.setItems(items);
+		fillList();
 
 		Controls.onSelect(list, $ -> {
 			int idx = list.getSelectionIndex();
-			if (idx < 0) {
-				template = null;
+			if (idx < 0 || idx >= templates.size()) {
+				selected = null;
 				setPageComplete(false);
 			} else {
-				template = templates[idx];
+				selected = templates.get(idx);
 				setPageComplete(true);
 			}
 		});
+	}
+
+	private void fillList() {
+		if (list == null)
+			return;
+		templates.clear();
+		selected = null;
+		setPageComplete(false);
+		var items = new ArrayList<String>();
+		for (var t : Template.values()) {
+			if (matchesFilter(t)) {
+				templates.add(t);
+						items.add(t.label());
+			}
+		}
+		list.setItems(items.toArray(new String[0]));
+	}
+
+	private boolean matchesFilter(Template template) {
+		return filter == null
+				|| filter == Boundaries.NONE
+				|| template.boundaries() == filter;
 	}
 }
