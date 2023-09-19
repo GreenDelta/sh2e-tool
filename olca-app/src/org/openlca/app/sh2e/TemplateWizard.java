@@ -118,7 +118,6 @@ class TemplateWizard extends Wizard {
 	private OptionSettings settings() {
 		var settings = new OptionSettings();
 		if (Option.No.equals(startPage.isDecisionSupport())) {
-			settings.put(Scope.APPLICATION, Application.ACCOUNTING);
 			settings.put(Scope.MODELLING, Modelling.ATTRIBUTIONAL);
 		} else {
 			settings.put(Scope.APPLICATION, modellingPage.application());

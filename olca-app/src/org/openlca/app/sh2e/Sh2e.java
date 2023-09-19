@@ -83,9 +83,7 @@ final class Sh2e {
 
 		MICRO("Micro-level decision support"),
 
-		MACRO("Meso/Macro-level decision support"),
-
-		ACCOUNTING("Accounting");
+		MACRO("Meso/Macro-level decision support");
 
 		private final String label;
 
