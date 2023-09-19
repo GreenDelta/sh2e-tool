@@ -4,31 +4,41 @@ import org.openlca.app.sh2e.Sh2e.Boundaries;
 
 enum Template {
 
-	T_1("1 - System producing hydrogen", Boundaries.PRODUCTION, null),
-	T_2("2.1 - System producing hydrogen and by-product/s - system expansion", Boundaries.PRODUCTION, null),
-	T_3("2.2 - System producing hydrogen and by-product/s - physical allocation", Boundaries.PRODUCTION, null),
-	T_4("2.3 - System producing hydrogen and by-product/s - economic allocation", Boundaries.PRODUCTION, null),
-	T_5("3.1 - System producing hydrogen as by-product - system expansion", Boundaries.PRODUCTION, null),
-	T_6("3.2 - System producing hydrogen as by-product - physical allocation", Boundaries.PRODUCTION, null),
-	T_7("3.3 - System producing hydrogen as by-product - economic allocation", Boundaries.PRODUCTION, null),
-	T_8("4.1 - System producing hydrogen with CCS", Boundaries.PRODUCTION, null),
-	T_9("4.2 - System producing hydrogen with CCU", Boundaries.PRODUCTION, null),
-	T_10("5.1 - System producing hydrogen from biomass", Boundaries.PRODUCTION, null),
-	T_11("5.2 - System producing hydrogen from biomass with CCS", Boundaries.PRODUCTION, null),
-	T_12("5.3 - System producing hydrogen from biomass with CCU", Boundaries.PRODUCTION, null),
-	T_13("6 - System producing hydrogen, incl. distribution", Boundaries.PRODUCTION, null),
+	T_1("Case 1 Cradle-to-gate 1 (hydrogen production) kg", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 1 (hydrogen production) kg.zip"),
+	T_2("Case 1 Cradle-to-gate 1 (hydrogen production) kg with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 1 (hydrogen production) kg with CCS.zip"),
+	T_3("Case 1 Cradle-to-gate 1 (hydrogen production) MJ", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 1 (hydrogen production) MJ.zip"),
+	T_4("Case 1 Cradle-to-gate 1 (hydrogen production) MJ with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 1 (hydrogen production) MJ with CCS.zip"),
+	T_5("Case 1 Cradle-to-gate 2 (hydrogen purification) kg", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 2 (hydrogen purification) kg.zip"),
+	T_6("Case 1 Cradle-to-gate 2 (hydrogen purification) kg with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 2 (hydrogen purification) kg with CCS.zip"),
+	T_7("Case 1 Cradle-to-gate 2 (hydrogen purification) MJ", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 2 (hydrogen purification) MJ.zip"),
+	T_8("Case 1 Cradle-to-gate 3 (hydrogen compression) MJ", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 3 (hydrogen compression) MJ.zip"),
+	T_9("Case 1 Cradle-to-gate 3 (hydrogen compression) MJ with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 3 (hydrogen compression) MJ with CCS.zip"),
+	T_10("Case 1 Cradle-to-gate 4 (hydrogen transportation) kg", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 4 (hydrogen transportation) kg.zip"),
+	T_11("Case 1 Cradle-to-gate 4 (hydrogen transportation) kg with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 4 (hydrogen transportation) kg with CCS.zip"),
+	T_12("Case 1 Cradle-to-gate 4 (hydrogen transportation) MJ", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 4 (hydrogen transportation) MJ.zip"),
+	T_13("Case 1 Cradle-to-gate 4 (hydrogen transportation) MJ with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 4 (hydrogen transportation) MJ with CCS.zip"),
+	T_14("Case 1 Cradle-to-gate 5 (hydrogen storage) kg", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 5 (hydrogen storage) kg.zip"),
+	T_15("Case 1 Cradle-to-gate 5 (hydrogen storage) kg with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 5 (hydrogen storage) kg with CCS.zip"),
+	T_16("Case 1 Cradle-to-gate 5 (hydrogen storage) MJ", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 5 (hydrogen storage) MJ.zip"),
+	T_17("Case 1 Cradle-to-gate 5 (hydrogen storage) MJ with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 5 (hydrogen storage) MJ with CCS.zip"),
+	T_18("Case 1 Cradle-to-gate 6 (hydrogen distribution) kg", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 6 (hydrogen distribution) kg.zip"),
+	T_19("Case 1 Cradle-to-gate 6 (hydrogen distribution) kg with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 6 (hydrogen distribution) kg with CCS.zip"),
+	T_20("Case 1 Cradle-to-gate 6 (hydrogen distribution) MJ", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 6 (hydrogen distribution) MJ.zip"),
+	T_21("Case 1 Cradle-to-gate 6 (hydrogen distribution) MJ with CCS", Boundaries.PRODUCTION, "templates/Case 1 Cradle-to-gate 6 (hydrogen distribution) MJ with CCS.zip"),
 
-	T_14("7 - System using hydrogen (generic)", Boundaries.USE, null),
-	T_15("7.1 - System using hydrogen - for transportation", Boundaries.USE, "x_template_7.1.zip"),
-	T_16("7.2 - System using hydrogen - for fuels and chemicals", Boundaries.USE, null),
-	T_17("7.3 - System using hydrogen - for electricity generation", Boundaries.USE, null),
-	T_18("7.4 - System using hydrogen - case of multifunctionality (generic)", Boundaries.USE, null),
-	T_19("7.4.1 - System using hydrogen - for electricity and heat generation - system expansion", Boundaries.USE, null),
-	T_20("7.4.2 - System using hydrogen - for electricity and heat generation - physical allocation", Boundaries.USE, null),
-	T_21("7.4.3 - System using hydrogen - for electricity and heat generation - economic allocation", Boundaries.USE, null),
-	T_22("7.4.4 - System using hydrogen - for electricity and heat generation - heat as an emission", Boundaries.USE, null),
-	T_23("7.5 - System using hydrogen and CO2-based product from different systems", Boundaries.USE, null),
-	T_24("7.6 - System using hydrogen and CO2-based product from the same system", Boundaries.USE, null);
+	T_22("Case 2 Hydrogen use for cogeneration (MJ)", Boundaries.USE, "templates/Case 2 Hydrogen use for cogeneration (MJ).zip"),
+	T_23("Case 2 Hydrogen use for electricity generation (MJ)", Boundaries.USE, "templates/Case 2 Hydrogen use for electricity generation (MJ).zip"),
+	T_24("Case 2 Hydrogen use for fuel or chemical production (kg)", Boundaries.USE, "templates/Case 2 Hydrogen use for fuel or chemical production (kg).zip"),
+	T_25("Case 2 Hydrogen use for fuel production (MJ)", Boundaries.USE, "templates/Case 2 Hydrogen use for fuel production (MJ).zip"),
+	T_26("Case 2 Hydrogen use for transportation (km)", Boundaries.USE, "templates/Case 2 Hydrogen use for transportation (km).zip"),
+	T_27("Case 2 Hydrogen use for transportation (p.km)", Boundaries.USE, "templates/Case 2 Hydrogen use for transportation (p.km).zip"),
+	T_28("Case 2 Hydrogen use for transportation (t.km)", Boundaries.USE, "templates/Case 2 Hydrogen use for transportation (t.km).zip"),
+
+	T_29("Case 3 Hydrogen production and use for transportation (km)", Boundaries.NONE, "templates/Case 3 Hydrogen production and use for transportation (km).zip"),
+	T_30("Case 3 Hydrogen production and use for transportation (p.km)", Boundaries.NONE, "templates/Case 3 Hydrogen production and use for transportation (p.km).zip"),
+	T_31("Case 3 Hydrogen production with CCS and use for transportation (km)", Boundaries.NONE, "templates/Case 3 Hydrogen production with CCS and use for transportation (km).zip"),
+
+	T_32("CCS", Boundaries.NONE, "templates/CCS.zip");
 
 	private final String label;
 	private final String file;
@@ -51,4 +61,5 @@ enum Template {
 	String label() {
 		return this.label;
 	}
+
 }
