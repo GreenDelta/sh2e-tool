@@ -11,6 +11,10 @@ class WizModellingPage extends WizardPage {
 
 	private Option scaleOption;
 	private Option modellingOption;
+	private Option statusOption;
+	private Option netOption;
+
+	private OptionGroup netBenefit;
 
 	WizModellingPage() {
 		super("WizModellingPage");
@@ -32,8 +36,23 @@ class WizModellingPage extends WizardPage {
 		UI.gridLayout(body, 1);
 		setControl(body);
 
-		Runnable checkState = () -> setPageComplete(
-				scaleOption != null && modellingOption != null);
+		Runnable checkState = () -> {
+			if (netBenefit != null && netBenefit.widget() != null) {
+					netBenefit.widget().setVisible(Option.Yes.equals(statusOption));
+			}
+
+			if ((scaleOption == null || statusOption == null)
+					|| (statusOption.equals(Option.Yes) && netOption == null)) {
+				setPageComplete(false);
+				return;
+			}
+
+			modellingOption = Option.Yes.equals(statusOption)
+					&& Option.Yes.equals(netOption)
+					? Modelling.CONSEQUENTIAL
+					: Modelling.ATTRIBUTIONAL;
+			setPageComplete(true);
+		};
 
 		var scaleGroup = OptionGroup.of(
 				"Scale",
@@ -46,14 +65,22 @@ class WizModellingPage extends WizardPage {
 
 		var statusGroup = OptionGroup.of(
 				"Status quo",
-				"Will the status quo change and can " +
-						"this change be modelled with a net benefit?",
+				"Will the status quo change?",
 				Option.Yes, Option.No);
 		statusGroup.renderOn(body).onSelect(option -> {
-			modellingOption = option.equals(Option.Yes)
-					? Modelling.CONSEQUENTIAL
-					: Modelling.ATTRIBUTIONAL;
+			statusOption = option;
 			checkState.run();
 		});
+
+		netBenefit = OptionGroup.of(
+				"Net benefit",
+				"Can this change be modelled with a net benefit?",
+				Option.Yes, Option.No);
+		netBenefit.renderOn(body).onSelect(option -> {
+			netOption = option;
+			checkState.run();
+		});
+		netBenefit.widget().setVisible(false);
 	}
+
 }
