@@ -1,5 +1,6 @@
 package org.openlca.app.sh2e;
 
+import org.mapdb.Fun;
 import org.openlca.app.sh2e.Sh2e.Boundaries;
 import org.openlca.app.sh2e.Sh2e.CSS;
 import org.openlca.app.sh2e.Sh2e.FunctionalUnit;
@@ -236,6 +237,10 @@ enum Template {
 	}
 
 	String label() {
+		return labelOf(boundaries, css, unit, productionPurpose, usePurpose);
+	}
+
+	static String labelOf(Boundaries boundaries, CSS css, FunctionalUnit unit, ProductionPurpose productionPurpose, UsePurpose usePurpose) {
 		String label;
 		if (boundaries == Boundaries.PRODUCTION) {
 			label = productionPurpose.label();
@@ -251,7 +256,6 @@ enum Template {
 			label += usePurpose.label().toLowerCase();
 			label += " (" + unit.label() + ")";
 		}
-
 		return label;
 	}
 
@@ -276,16 +280,16 @@ enum Template {
 				if (option instanceof FunctionalUnit u)
 					unit = u;
 				if (option instanceof ProductionPurpose p)
-					productionPurpose = p;
+					productionPurpose = p == ProductionPurpose.NONE ? null : p;
 				if (option instanceof UsePurpose u)
-					usePurpose = u;
+					usePurpose = u == UsePurpose.NONE ? null : u;
 			}
 		}
 
 		@Override
 		public String toString() {
 			return String.format("Filter(boundaries=%s, css=%s, unit=%s, "
-							+ "productionPurpose=%s, usePurpose=%s",
+							+ "productionPurpose=%s, usePurpose=%s)",
 					boundaries, css, unit, productionPurpose, usePurpose);
 		}
 

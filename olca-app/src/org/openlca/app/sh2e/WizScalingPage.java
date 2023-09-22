@@ -1,6 +1,5 @@
 package org.openlca.app.sh2e;
 
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -76,11 +75,6 @@ class WizScalingPage extends WizardPage {
 		var msg = text.getText().strip();
 		learningCurve =  Strings.notEmpty(msg)
 				? Option.from(msg) : null;
-	}
-
-	@Override
-	public IWizardPage getPreviousPage() {
-		return null;
 	}
 
 }

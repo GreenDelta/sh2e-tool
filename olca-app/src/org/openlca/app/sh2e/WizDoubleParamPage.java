@@ -1,6 +1,5 @@
 package org.openlca.app.sh2e;
 
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -39,11 +38,6 @@ public abstract class WizDoubleParamPage extends WizardPage {
 			text.setBackground(Colors.errorColor());
 			setter.accept(null);
 		}
-	}
-
-	@Override
-	public IWizardPage getPreviousPage() {
-		return null;
 	}
 
 }

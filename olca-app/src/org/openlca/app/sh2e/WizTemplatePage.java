@@ -2,10 +2,10 @@ package org.openlca.app.sh2e;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 
 import org.openlca.app.sh2e.Sh2e.Option;
@@ -21,6 +21,7 @@ class WizTemplatePage extends WizardPage {
 	private ArrayList<Template> templates = new ArrayList<>();
 	private final Template.Filter filter = new Template.Filter();
 	private List list;
+	private Label label;
 
 	WizTemplatePage() {
 		super("WizTemplatePage");
@@ -55,7 +56,8 @@ class WizTemplatePage extends WizardPage {
 		text.addModifyListener(
 				e -> category = text.getText().strip());
 
-		UI.label(body, "Select a template:");
+		label = UI.label(body, "Select a template:");
+		UI.gridData(label, true, true);
 		list = new List(body, SWT.BORDER);
 		UI.gridData(list, true, true);
 
@@ -76,14 +78,21 @@ class WizTemplatePage extends WizardPage {
 			return;
 		selected = null;
 		setPageComplete(false);
-		System.out.println("filter: " + filter);
 		var selection = new Template.Selection(Template.values());
+		System.out.println(filter);
 		selection.filter(filter);
 		templates = selection.get();
 		var items = templates.stream().map(Template::label).toArray(String[]::new);
 		list.setItems(items);
-		if (list.getItemCount() == 1) {
-			list.select(0);
+		if (list.getItemCount() == 0) {
+			var output = Template.labelOf(
+					filter.boundaries,
+					filter.css,
+					filter.unit,
+					filter.productionPurpose,
+					filter.usePurpose);
+			label.setText("No template available for these setup: " + output);
 		}
 	}
+
 }

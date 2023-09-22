@@ -22,6 +22,10 @@ class WizUsePurposePage extends WizardPage {
 		return selected;
 	}
 
+	public void setPurpose(Sh2e.UsePurpose purpose) {
+		selected = purpose;
+	}
+
 	@Override
 	public void createControl(Composite parent) {
 		var body = UI.composite(parent);
@@ -38,10 +42,4 @@ class WizUsePurposePage extends WizardPage {
 					checkState.run();
 				});
 	}
-
-	@Override
-	public IWizardPage getPreviousPage() {
-		return null;
-	}
-
 }

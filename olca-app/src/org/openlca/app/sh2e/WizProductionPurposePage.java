@@ -20,6 +20,10 @@ class WizProductionPurposePage extends WizardPage {
 		return selected;
 	}
 
+	public void setPurpose(Sh2e.ProductionPurpose purpose) {
+		selected = purpose;
+	}
+
 	@Override
 	public void createControl(Composite parent) {
 		var body = UI.composite(parent);
@@ -36,4 +40,5 @@ class WizProductionPurposePage extends WizardPage {
 					selected = option;
 				});
 	}
+
 }

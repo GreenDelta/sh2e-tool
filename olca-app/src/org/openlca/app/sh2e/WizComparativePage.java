@@ -1,14 +1,10 @@
 package org.openlca.app.sh2e;
 
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
-import org.openlca.app.sh2e.Sh2e.EndOfLife;
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.UI;
-import org.openlca.util.Strings;
 
 class WizComparativePage extends WizardPage {
 
@@ -40,11 +36,6 @@ class WizComparativePage extends WizardPage {
 					? Sh2e.ComparativeLCA.COMPARATIVE
 					: Sh2e.ComparativeLCA.ABSOLUTE;
 		});
-	}
-
-	@Override
-	public IWizardPage getPreviousPage() {
-		return null;
 	}
 
 }
