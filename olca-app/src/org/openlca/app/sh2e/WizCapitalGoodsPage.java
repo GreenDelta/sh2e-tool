@@ -33,7 +33,7 @@ class WizCapitalGoodsPage extends WizardPage {
 				Scope.CAPITAL_GOODS.label(),
 				"Are there any excluded capital goods in any phase?",
 				Option.No,
-				Option.from("Yes. Please state and include a justification"));
+				Option.from("Yes. Please state and include a justification:"));
 		var comp = group.renderOn(body).widget();
 		var text = UI.text(comp);
 		UI.fillHorizontal(text);

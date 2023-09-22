@@ -9,6 +9,7 @@ import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.UI;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -31,6 +32,14 @@ class OptionGroup {
 	static OptionGroup of(Scope group, String question) {
 		return new OptionGroup(
 				group.label(), question, group.options());
+	}
+
+	static OptionGroup of(Scope group, String question,
+			Option... excludedOptions) {
+		var options = new ArrayList<>(group.options());
+		options.removeAll(List.of(excludedOptions));
+		return new OptionGroup(
+				group.label(), question, options);
 	}
 
 	static OptionGroup of(

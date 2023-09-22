@@ -1,23 +1,25 @@
 package org.openlca.app.sh2e;
 
+import java.util.ArrayList;
+
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
-import org.openlca.app.sh2e.Sh2e.Boundaries;
+
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.UI;
 
-import java.util.ArrayList;
 
 class WizTemplatePage extends WizardPage {
 
 	private String category;
 	private Template selected;
 
-	private final ArrayList<Template> templates = new ArrayList<>();
-	private Boundaries filter;
+	private ArrayList<Template> templates = new ArrayList<>();
+	private final Template.Filter filter = new Template.Filter();
 	private List list;
 
 	WizTemplatePage() {
@@ -28,16 +30,8 @@ class WizTemplatePage extends WizardPage {
 		setPageComplete(false);
 	}
 
-	void setFilter(Option option) {
-		Boundaries filter = null;
-		for (var b : Boundaries.values()) {
-			if (b == option) {
-				filter = b;
-				break;
-			}
-		}
-		this.filter = filter;
-		fillList();
+	void addFilter(Option... options) {
+		filter.add(options);
 	}
 
 	public String category() {
@@ -64,7 +58,6 @@ class WizTemplatePage extends WizardPage {
 		UI.label(body, "Select a template:");
 		list = new List(body, SWT.BORDER);
 		UI.gridData(list, true, true);
-		fillList();
 
 		Controls.onSelect(list, $ -> {
 			int idx = list.getSelectionIndex();
@@ -78,25 +71,19 @@ class WizTemplatePage extends WizardPage {
 		});
 	}
 
-	private void fillList() {
+	protected void fillList() {
 		if (list == null)
 			return;
-		templates.clear();
 		selected = null;
 		setPageComplete(false);
-		var items = new ArrayList<String>();
-		for (var t : Template.values()) {
-			if (matchesFilter(t)) {
-				templates.add(t);
-						items.add(t.label());
-			}
+		System.out.println("filter: " + filter);
+		var selection = new Template.Selection(Template.values());
+		selection.filter(filter);
+		templates = selection.get();
+		var items = templates.stream().map(Template::label).toArray(String[]::new);
+		list.setItems(items);
+		if (list.getItemCount() == 1) {
+			list.select(0);
 		}
-		list.setItems(items.toArray(new String[0]));
-	}
-
-	private boolean matchesFilter(Template template) {
-		return filter == null
-				|| filter == Boundaries.NONE
-				|| template.boundaries() == filter;
 	}
 }

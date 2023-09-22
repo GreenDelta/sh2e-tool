@@ -40,7 +40,30 @@ final class Sh2e {
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
 		BOUNDARIES("System boundaries", Boundaries.values()),
 		TECHNOLOGY_LEVEL("Technology readiness level", TechnologyLevel.values()),
-		CRADLE_TO_GATE("Boundary of hydrogen production", CradleToGate.values());
+		// TODO (francois): missing word
+		OPERATING_SCALE("Operating scale", new Option[]{Option.Yes, Option.No}),
+		LEARNING_CURVE("Learning Curve Method", LearningCurve.values()),
+		HYDROGEN_CALORIFIC("Hydrogen net calorific value (MJ/kg)",
+				UserInput.values()),
+		HYDROGEN_PURITY("Hydrogen purity (%)", UserInput.values()),
+		HYDROGEN_TEMPERATURE("Hydrogen temperature (°C)", UserInput.values()),
+		HYDROGEN_PRESSURE("Hydrogen pressure (bar)", UserInput.values()),
+		HYDROGEN_CAPACITY("Operating production capacity (kg H₂/year)",
+				UserInput.values()),
+		FUNCTIONAL_UNIT("Functional unit", FunctionalUnit.values()),
+		CCS("Carbon capture and storage	", CSS.values()),
+		PRODUCTION_PURPOSE("Boundary of hydrogen production",
+				ProductionPurpose.values()),
+		COMPARATIVE_LCA("Comparative LCA", ComparativeLCA.values()),
+		USE_PURPOSE("Use purpose", UsePurpose.values()),
+		VEHICLE_LIFETIME("Vehicle lifetime (years)", UserInput.values()),
+		VEHICLE_COMSUMPTION("Vehicle consumption (kg H₂/100km)",
+				UserInput.values()),
+		FUEL_PURITY("Fuel or chemical purity (%)", UserInput.values()),
+		FUEL_TEMPERATURE("Fuel or chemical temperature (°C)", UserInput.values()),
+		FUEL_PRESSURE("Fuel or chemical pressure (kPa)", UserInput.values()),
+		FUEL_CALORIFIC("Fuel net calorific value (MJ/kg)",
+				UserInput.values());
 
 		private final String label;
 		private final Option[] options;
@@ -142,6 +165,28 @@ final class Sh2e {
 		}
 	}
 
+	public enum ComparativeLCA implements Option {
+
+		COMPARATIVE("Comparative study"),
+
+		ABSOLUTE("Absolute study");
+
+		private final String label;
+
+		ComparativeLCA(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
+
 	public enum EndOfLife implements Option {
 
 		CUTOFF("Cut-off approach"),
@@ -150,7 +195,7 @@ final class Sh2e {
 
 		CIRCULAR("Circular footprint formula"),
 
-		OTHER("Other approach, please state");
+		OTHER("Other approach, please state:");
 
 		private final String label;
 
@@ -232,6 +277,27 @@ final class Sh2e {
 		}
 	}
 
+	public enum CSS implements Option {
+
+		WITH_CSS("with CSS"),
+
+		WITHOUT_CSS("without CSS");
+
+		private final String label;
+
+		CSS(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
 	public enum TechnologyLevel implements Option {
 
 		TRL_1("TRL 1 - basic principles observed"),
@@ -259,18 +325,122 @@ final class Sh2e {
 		}
 	}
 
-	public enum CradleToGate implements Option {
+	public enum LearningCurve implements Option {
 
-		C2G_1("Cradle-to-gate 1"),
-		C2G_2("Cradle-to-gate 2"),
-		C2G_3("Cradle-to-gate 3"),
-		C2G_4("Cradle-to-gate 4"),
-		C2G_5("Cradle-to-gate 5"),
-		C2G_6("Cradle-to-gate 6");
+		NOT_STATED("No"),
+		STATED("Yes. Please state the learning curve method:");
 
 		private final String label;
 
-		CradleToGate(String label) {
+		LearningCurve(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+
+	}
+
+	public enum FunctionalUnit implements Option {
+
+		KG_H2("kg of H₂"),
+		MJ_H2("MJ (LHV) of H₂"),
+
+		KM("km travelled"),
+		PASSENGER_LOAD("passenger load (p.km)"),
+		FREIGHT_LOAD("freight load (t.km)"),
+
+		KG_FUEL_CHEMICAL("kg of fuel/chemical"),
+		MJ_FUEL("MJ (LHV) of fuel"),
+
+		MJ_ELEC("Energy (MJ)"),
+
+		MJ_COGENERATION("Energy (MJ) (for cogeneration system)");
+
+		private final String label;
+
+		FunctionalUnit(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+
+	}
+
+	public enum UsePurpose implements Option {
+
+		TRANSPORTATION("Transportation"),
+
+		FUELS("Fuels production"),
+
+		CHEMICALS("Chemical production"),
+
+		ELECTRICITY("Electricity production"),
+
+		HEAT("Heat production"),
+
+		NONE("None");
+
+		private final String label;
+
+		UsePurpose(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+	}
+
+	public enum UserInput implements Option {
+
+		DOUBLE("Double"),
+		INTEGER("Integer");
+
+		private final String label;
+
+		UserInput(String label) {
+			this.label = label;
+		}
+
+		public static Option of(String label) {
+			return Sh2e.optionOf(label, values());
+		}
+
+		public String label() {
+			return label;
+		}
+
+	}
+
+	public enum ProductionPurpose implements Option {
+
+		PRODUCTION("Hydrogen production"),
+		PURIFICATION("Hydrogen purification"),
+		COMPRESSION("Hydrogen compression"),
+		TRANSPORTATION("Hydrogen transportation"),
+		STORAGE("Hydrogen storage"),
+		DISTRIBUTION("Hydrogen distribution"),
+		NONE("None");
+
+		private final String label;
+
+		ProductionPurpose(String label) {
 			this.label = label;
 		}
 

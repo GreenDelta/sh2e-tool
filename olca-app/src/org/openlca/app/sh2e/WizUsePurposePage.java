@@ -1,22 +1,24 @@
 package org.openlca.app.sh2e;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.openlca.app.sh2e.Sh2e.Option;
-import org.openlca.app.sh2e.Sh2e.Scope;
 import org.openlca.app.util.UI;
 
-class WizCradleToGatePage extends WizardPage {
+class WizUsePurposePage extends WizardPage {
 
 	private Option selected;
 
-	WizCradleToGatePage() {
-		super("WizCradleToGatePage");
-		setTitle(Scope.CRADLE_TO_GATE.label());
+	public final Runnable checkState = () -> setPageComplete(selected != null);
+
+	WizUsePurposePage() {
+		super("WizUsePurposePage");
+		setTitle("Hydrogen use purpose");
 		setPageComplete(false);
 	}
 
-	Option cradleToGate() {
+	Option purpose() {
 		return selected;
 	}
 
@@ -25,14 +27,21 @@ class WizCradleToGatePage extends WizardPage {
 		var body = UI.composite(parent);
 		UI.gridLayout(body, 1);
 		setControl(body);
+
 		OptionGroup.of(
-						Scope.CRADLE_TO_GATE,
-						"Please state the system boundary of " +
-								"the hydrogen production:")
+						Sh2e.Scope.USE_PURPOSE,
+						"Please select the purpose of the hydrogen use:",
+						Sh2e.UsePurpose.NONE)
 				.renderOn(body)
 				.onSelect(option -> {
-					setPageComplete(true);
 					selected = option;
+					checkState.run();
 				});
 	}
+
+	@Override
+	public IWizardPage getPreviousPage() {
+		return null;
+	}
+
 }
