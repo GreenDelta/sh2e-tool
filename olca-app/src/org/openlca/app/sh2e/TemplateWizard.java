@@ -277,16 +277,24 @@ class TemplateWizard extends Wizard {
 		// Boundaries: USE
 		if (page == usePurposePage) {
 			templatePage.addFilter(usePurposePage.purpose());
-			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION)
+			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION) {
+				fuelsChemicalPage.setPageComplete(true);
 				return transportationPage;
-			if (usePurposePage.purpose() == UsePurpose.FUELS)
+			}
+			if (usePurposePage.purpose() == UsePurpose.FUELS) {
+				transportationPage.setPageComplete(true);
 				return fuelsChemicalPage.forFuel(true);
-			if (usePurposePage.purpose() == UsePurpose.CHEMICALS)
+			}
+			if (usePurposePage.purpose() == UsePurpose.CHEMICALS) {
+				transportationPage.setPageComplete(true);
 				return fuelsChemicalPage.forFuel(false);
-			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY)
+			}
+			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY
+					|| usePurposePage.purpose() == UsePurpose.HEAT) {
+				transportationPage.setPageComplete(true);
+				fuelsChemicalPage.setPageComplete(true);
 				return comparativePage;
-			if (usePurposePage.purpose() == UsePurpose.HEAT)
-				return comparativePage;
+			}
 		}
 		if (page == fuelsChemicalPage) {
 			templatePage.addFilter(fuelsChemicalPage.unit());

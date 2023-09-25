@@ -57,7 +57,7 @@ class WizTemplatePage extends WizardPage {
 				e -> category = text.getText().strip());
 
 		label = UI.label(body, "Select a template:");
-		UI.gridData(label, true, true);
+		UI.fillHorizontal(label);
 		list = new List(body, SWT.BORDER);
 		UI.gridData(list, true, true);
 
@@ -91,7 +91,9 @@ class WizTemplatePage extends WizardPage {
 					filter.unit,
 					filter.productionPurpose,
 					filter.usePurpose);
-			label.setText("No template available for these setup: " + output);
+			label.setText("No template available for this setup: " + output);
+		} else {
+			label.setText("Select a template:");
 		}
 	}
 

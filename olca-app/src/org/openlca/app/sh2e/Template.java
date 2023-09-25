@@ -249,6 +249,7 @@ enum Template {
 		} else if (boundaries == Boundaries.USE) {
 			label = boundaries.label() + " for ";
 			label += usePurpose.label().toLowerCase();
+			label += css == CSS.WITH_CSS ? " with CSS" : "";
 			label += " (" + unit.label() + ")";
 		} else {
 			label = Boundaries.PRODUCTION.label();
