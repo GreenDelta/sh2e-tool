@@ -48,7 +48,7 @@ final class Sh2e {
 		HYDROGEN_PURITY("Hydrogen purity (%)", UserInput.values()),
 		HYDROGEN_TEMPERATURE("Hydrogen temperature (°C)", UserInput.values()),
 		HYDROGEN_PRESSURE("Hydrogen pressure (bar)", UserInput.values()),
-		HYDROGEN_CAPACITY("Operating production capacity (kg H₂/year)",
+		HYDROGEN_CAPACITY("Operating production capacity (kg H2/year)",
 				UserInput.values()),
 		FUNCTIONAL_UNIT("Functional unit", FunctionalUnit.values()),
 		CCS("Carbon capture and storage	", CSS.values()),
@@ -57,7 +57,7 @@ final class Sh2e {
 		COMPARATIVE_LCA("Comparative LCA", ComparativeLCA.values()),
 		USE_PURPOSE("Use purpose", UsePurpose.values()),
 		VEHICLE_LIFETIME("Vehicle lifetime (years)", UserInput.values()),
-		VEHICLE_COMSUMPTION("Vehicle consumption (kg H₂/100km)",
+		VEHICLE_COMSUMPTION("Vehicle consumption (kg H2/100km)",
 				UserInput.values()),
 		FUEL_PURITY("Fuel or chemical purity (%)", UserInput.values()),
 		FUEL_TEMPERATURE("Fuel or chemical temperature (°C)", UserInput.values()),
@@ -348,8 +348,8 @@ final class Sh2e {
 
 	public enum FunctionalUnit implements Option {
 
-		KG_H2("kg of H₂"),
-		MJ_H2("MJ (LHV) of H₂"),
+		KG_H2("kg of H2"),
+		MJ_H2("MJ (LHV) of H2"),
 
 		KM("km travelled"),
 		PASSENGER_LOAD("passenger load (p.km)"),
