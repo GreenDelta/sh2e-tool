@@ -1,6 +1,5 @@
 package org.openlca.app.sh2e;
 
-import org.mapdb.Fun;
 import org.openlca.app.sh2e.Sh2e.Boundaries;
 import org.openlca.app.sh2e.Sh2e.CSS;
 import org.openlca.app.sh2e.Sh2e.FunctionalUnit;

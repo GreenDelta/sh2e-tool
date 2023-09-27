@@ -79,11 +79,11 @@ class WizTemplatePage extends WizardPage {
 		selected = null;
 		setPageComplete(false);
 		var selection = new Template.Selection(Template.values());
-		System.out.println(filter);
 		selection.filter(filter);
 		templates = selection.get();
 		var items = templates.stream().map(Template::label).toArray(String[]::new);
 		list.setItems(items);
+
 		if (list.getItemCount() == 0) {
 			var output = Template.labelOf(
 					filter.boundaries,
@@ -95,6 +95,12 @@ class WizTemplatePage extends WizardPage {
 		} else {
 			label.setText("Select a template:");
 		}
+
+		if (list.getItemCount() == 1) {
+			list.select(0);
+		}
+
+		setPageComplete(list.getItemCount() < 2);
 	}
 
 }

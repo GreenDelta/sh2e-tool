@@ -66,6 +66,12 @@ class TemplateWizard extends Wizard {
 	}
 
 	@Override
+	public boolean canFinish() {
+		return getContainer().getCurrentPage() == templatePage
+				&& templatePage.isPageComplete();
+	}
+
+	@Override
 	public boolean performFinish() {
 		var template = templatePage.template();
 		if (template == null)
@@ -201,10 +207,8 @@ class TemplateWizard extends Wizard {
 	public IWizardPage getNextPage(IWizardPage page) {
 		if (page == startPage) {
 			if (Option.Yes.equals(startPage.isDecisionSupport())) {
-				modellingPage.setPageComplete(false);
 				return modellingPage;
 			} else {
-				modellingPage.setPageComplete(true);
 				return prospectivityPage;
 			}
 		}
@@ -213,15 +217,9 @@ class TemplateWizard extends Wizard {
 
 		if (page == prospectivityPage) {
 			if (prospectivityPage.prospectivity()
-					== Prospectivity.RETROSPECTIVE) {
-				technologyPage.setPageComplete(true);
-				scalingPage.setPageComplete(true);
+					== Prospectivity.RETROSPECTIVE)
 				return boundariesPage;
-			} else {
-				technologyPage.setPageComplete(
-						technologyPage.technologyLevel() != null);
-				return technologyPage;
-			}
+			return technologyPage;
 		}
 
 		if (page == technologyPage)
@@ -232,28 +230,7 @@ class TemplateWizard extends Wizard {
 
 		if (page == boundariesPage) {
 			templatePage.addFilter(boundariesPage.boundaries());
-			if (boundariesPage.boundaries() == Boundaries.USE) {
-				templatePage.addFilter(Sh2e.ProductionPurpose.NONE);
-				productionPurposePage.setPageComplete(true);
-				productionPage.setPageComplete(true);
-				return usePurposePage;
-			} else {
-				var prod = boundariesPage.boundaries() == Boundaries.PRODUCTION;
-				usePurposePage.setPageComplete(prod);
-				transportationPage.setPageComplete(prod);
-				fuelsChemicalPage.setPageComplete(prod);
-				if (prod) {
-					templatePage.addFilter(Sh2e.UsePurpose.NONE);
-					productionPurposePage.setPageComplete(
-							productionPurposePage.purpose() != null);
-					return productionPurposePage;
-				} else {
-					productionPurposePage.setPageComplete(true);
-					productionPurposePage.setPurpose(Sh2e.ProductionPurpose.PRODUCTION);
-					templatePage.addFilter(Sh2e.ProductionPurpose.PRODUCTION);
-					return productionPage.withUse(true);
-				}
-			}
+			return pageAfterBoundaries();
 		}
 
 		// Boundaries: PRODUCTION
@@ -266,7 +243,6 @@ class TemplateWizard extends Wizard {
 		if (page == productionPage) {
 			templatePage.addFilter(productionPage.ccs(), productionPage.unit());
 			if (boundariesPage.boundaries() == Boundaries.NONE) {
-				usePurposePage.setPageComplete(true);
 				usePurposePage.setPurpose(UsePurpose.TRANSPORTATION);
 				templatePage.addFilter(UsePurpose.TRANSPORTATION);
 				return transportationPage;
@@ -277,25 +253,17 @@ class TemplateWizard extends Wizard {
 		// Boundaries: USE
 		if (page == usePurposePage) {
 			templatePage.addFilter(usePurposePage.purpose());
-			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION) {
-				fuelsChemicalPage.setPageComplete(true);
+			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION)
 				return transportationPage;
-			}
-			if (usePurposePage.purpose() == UsePurpose.FUELS) {
-				transportationPage.setPageComplete(true);
+			if (usePurposePage.purpose() == UsePurpose.FUELS)
 				return fuelsChemicalPage.forFuel(true);
-			}
-			if (usePurposePage.purpose() == UsePurpose.CHEMICALS) {
-				transportationPage.setPageComplete(true);
+			if (usePurposePage.purpose() == UsePurpose.CHEMICALS)
 				return fuelsChemicalPage.forFuel(false);
-			}
 			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY
-					|| usePurposePage.purpose() == UsePurpose.HEAT) {
-				transportationPage.setPageComplete(true);
-				fuelsChemicalPage.setPageComplete(true);
+					|| usePurposePage.purpose() == UsePurpose.HEAT)
 				return comparativePage;
-			}
 		}
+
 		if (page == fuelsChemicalPage) {
 			templatePage.addFilter(fuelsChemicalPage.unit());
 			return comparativePage;
@@ -322,4 +290,22 @@ class TemplateWizard extends Wizard {
 				? null
 				: templatePage;
 	}
+
+	private IWizardPage pageAfterBoundaries() {
+		if (boundariesPage.boundaries() == Boundaries.USE) {
+			templatePage.addFilter(Sh2e.ProductionPurpose.NONE);
+			return usePurposePage;
+		} else {
+			var prod = boundariesPage.boundaries() == Boundaries.PRODUCTION;
+			if (prod) {
+				templatePage.addFilter(Sh2e.UsePurpose.NONE);
+				return productionPurposePage;
+			} else {
+				productionPurposePage.setPurpose(Sh2e.ProductionPurpose.PRODUCTION);
+				templatePage.addFilter(Sh2e.ProductionPurpose.PRODUCTION);
+				return productionPage.withUse(true);
+			}
+		}
+	}
+
 }
