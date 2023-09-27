@@ -52,7 +52,7 @@ final class Sh2e {
 				UserInput.values()),
 		FUNCTIONAL_UNIT("Functional unit", FunctionalUnit.values()),
 		CCS("Carbon capture and storage	", CSS.values()),
-		PRODUCTION_PURPOSE("Boundary of hydrogen production",
+		PRODUCTION_PURPOSE("Boundaries of hydrogen production",
 				ProductionPurpose.values()),
 		COMPARATIVE_LCA("Comparative LCA", ComparativeLCA.values()),
 		USE_PURPOSE("Use purpose", UsePurpose.values()),
@@ -430,12 +430,12 @@ final class Sh2e {
 
 	public enum ProductionPurpose implements Option {
 
-		PRODUCTION("Hydrogen production"),
-		PURIFICATION("Hydrogen purification"),
-		COMPRESSION("Hydrogen compression"),
-		TRANSPORTATION("Hydrogen transportation"),
-		STORAGE("Hydrogen storage"),
-		DISTRIBUTION("Hydrogen distribution"),
+		PRODUCTION("Cradle-to-gate 1 (hydrogen production)"),
+		PURIFICATION("Cradle-to-gate 2 (hydrogen purification)"),
+		COMPRESSION("Cradle-to-gate 3 (hydrogen compression)"),
+		TRANSPORTATION("Cradle-to-gate 4 (hydrogen transportation)"),
+		STORAGE("Cradle-to-gate 5 (hydrogen storage)"),
+		DISTRIBUTION("Cradle-to-gate 6 (hydrogen distribution)"),
 		NONE("None");
 
 		private final String label;
