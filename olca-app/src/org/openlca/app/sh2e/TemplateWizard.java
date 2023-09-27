@@ -9,6 +9,7 @@ import org.openlca.app.db.Database;
 import org.openlca.app.navigation.Navigator;
 import org.openlca.app.rcp.RcpActivator;
 import org.openlca.app.sh2e.Sh2e.Boundaries;
+import org.openlca.app.sh2e.Sh2e.FunctionalUnit;
 import org.openlca.app.sh2e.Sh2e.Modelling;
 import org.openlca.app.sh2e.Sh2e.Option;
 import org.openlca.app.sh2e.Sh2e.Prospectivity;
@@ -245,7 +246,8 @@ class TemplateWizard extends Wizard {
 			if (boundariesPage.boundaries() == Boundaries.NONE) {
 				usePurposePage.setPurpose(UsePurpose.TRANSPORTATION);
 				templatePage.addFilter(UsePurpose.TRANSPORTATION);
-				return transportationPage;
+				return transportationPage
+						.with(boundariesPage.boundaries(), productionPage.ccs());
 			}
 			return comparativePage;
 		}
@@ -254,7 +256,8 @@ class TemplateWizard extends Wizard {
 		if (page == usePurposePage) {
 			templatePage.addFilter(usePurposePage.purpose());
 			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION)
-				return transportationPage;
+				return transportationPage
+						.with(boundariesPage.boundaries(), Sh2e.CSS.WITHOUT_CSS);
 			if (usePurposePage.purpose() == UsePurpose.FUELS)
 				return fuelsChemicalPage.forFuel(true);
 			if (usePurposePage.purpose() == UsePurpose.CHEMICALS)
