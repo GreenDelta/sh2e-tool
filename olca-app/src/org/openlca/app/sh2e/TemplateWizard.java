@@ -244,10 +244,7 @@ class TemplateWizard extends Wizard {
 		if (page == productionPage) {
 			templatePage.addFilter(productionPage.ccs(), productionPage.unit());
 			if (boundariesPage.boundaries() == Boundaries.NONE) {
-				usePurposePage.setPurpose(UsePurpose.TRANSPORTATION);
-				templatePage.addFilter(UsePurpose.TRANSPORTATION);
-				return transportationPage
-						.with(boundariesPage.boundaries(), productionPage.ccs());
+				return usePurposePage;
 			}
 			return comparativePage;
 		}
@@ -256,25 +253,28 @@ class TemplateWizard extends Wizard {
 		if (page == usePurposePage) {
 			templatePage.addFilter(usePurposePage.purpose());
 			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION)
-				return transportationPage
-						.with(boundariesPage.boundaries(), Sh2e.CSS.WITHOUT_CSS);
+				return transportationPage;
 			if (usePurposePage.purpose() == UsePurpose.FUELS)
 				return fuelsChemicalPage.forFuel(true);
 			if (usePurposePage.purpose() == UsePurpose.CHEMICALS)
 				return fuelsChemicalPage.forFuel(false);
-			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY
-					|| usePurposePage.purpose() == UsePurpose.HEAT)
+			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY) {
+				templatePage.addFilter(FunctionalUnit.MJ_ELEC);
 				return comparativePage;
-		}
-
-		if (page == fuelsChemicalPage) {
-			templatePage.addFilter(fuelsChemicalPage.unit());
-			return comparativePage;
+			}
+			if (usePurposePage.purpose() == UsePurpose.HEAT) {
+				templatePage.addFilter(FunctionalUnit.MJ_COGENERATION);
+				return comparativePage;
+			}
 		}
 
 		// Boundaries: USE or NONE
 		if (page == transportationPage) {
 			templatePage.addFilter(transportationPage.unit());
+			return comparativePage;
+		}
+		if (page == fuelsChemicalPage) {
+			templatePage.addFilter(fuelsChemicalPage.unit());
 			return comparativePage;
 		}
 

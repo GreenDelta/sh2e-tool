@@ -279,9 +279,9 @@ final class Sh2e {
 
 	public enum CSS implements Option {
 
-		WITH_CSS("with CSS"),
+		WITHOUT_CSS("without CSS"),
 
-		WITHOUT_CSS("without CSS");
+		WITH_CSS("with CSS");
 
 		private final String label;
 
@@ -384,7 +384,7 @@ final class Sh2e {
 
 		FUELS("Fuels production"),
 
-		CHEMICALS("Chemical production"),
+		CHEMICALS("Fuels or chemical production"),
 
 		ELECTRICITY("Electricity production"),
 

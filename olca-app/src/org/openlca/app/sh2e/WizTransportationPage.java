@@ -13,8 +13,7 @@ class WizTransportationPage extends WizDoubleParamPage {
 	private Option lifetime;
 	private Option consumption;
 	private Option unit;
-	private OptionGroup threeUnitGroup;
-	private OptionGroup twoUnitsGroup;
+	private OptionGroup unitGroup;
 
 	WizTransportationPage() {
 		super("WizTransportationPage");
@@ -37,19 +36,6 @@ class WizTransportationPage extends WizDoubleParamPage {
 		return unit;
 	}
 
-
-	public IWizardPage with(Option boundaries, Option css) {
-		threeUnitGroup.widget().setVisible(boundaries == Sh2e.Boundaries.USE);
-		twoUnitsGroup.widget().setVisible(
-				boundaries == Sh2e.Boundaries.NONE &&
-						css == Sh2e.CSS.WITHOUT_CSS);
-		if (boundaries == Sh2e.Boundaries.NONE && css == Sh2e.CSS.WITH_CSS) {
-			unit = Sh2e.FunctionalUnit.KM;
-		}
-
-		return this;
-	}
-
 	@Override
 	public void createControl(Composite parent) {
 		var body = UI.composite(parent);
@@ -64,23 +50,13 @@ class WizTransportationPage extends WizDoubleParamPage {
 		labeledText(param, Sh2e.Scope.VEHICLE_COMSUMPTION, o -> consumption = o);
 
 		// Depending on context, the user can select between 3, 2 or 1 units.
-		threeUnitGroup = OptionGroup.of(
+		unitGroup = OptionGroup.of(
 				Sh2e.Scope.FUNCTIONAL_UNIT.label(),
 				"Please select the functional unit:",
 				Sh2e.FunctionalUnit.KM,
 				Sh2e.FunctionalUnit.PASSENGER_LOAD,
 				Sh2e.FunctionalUnit.FREIGHT_LOAD);
-		threeUnitGroup.renderOn(body).onSelect(option -> {
-			unit = option;
-			checkState.run();
-		});
-
-		twoUnitsGroup = OptionGroup.of(
-				Sh2e.Scope.FUNCTIONAL_UNIT.label(),
-				"Please select the functional unit:",
-				Sh2e.FunctionalUnit.KM,
-				Sh2e.FunctionalUnit.PASSENGER_LOAD);
-		twoUnitsGroup.renderOn(body).onSelect(option -> {
+		unitGroup.renderOn(body).onSelect(option -> {
 			unit = option;
 			checkState.run();
 		});
