@@ -192,7 +192,7 @@ class TemplateWizard extends Wizard {
 			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY) {
 				settings.put(Scope.FUNCTIONAL_UNIT, Sh2e.FunctionalUnit.MJ_ELEC);
 			}
-			if (usePurposePage.purpose() == UsePurpose.HEAT) {
+			if (usePurposePage.purpose() == UsePurpose.COGENERATION) {
 				settings.put(Scope.FUNCTIONAL_UNIT, Sh2e.FunctionalUnit.MJ_COGENERATION);
 			}
 
@@ -262,7 +262,7 @@ class TemplateWizard extends Wizard {
 				templatePage.addFilter(FunctionalUnit.MJ_ELEC);
 				return comparativePage;
 			}
-			if (usePurposePage.purpose() == UsePurpose.HEAT) {
+			if (usePurposePage.purpose() == UsePurpose.COGENERATION) {
 				templatePage.addFilter(FunctionalUnit.MJ_COGENERATION);
 				return comparativePage;
 			}

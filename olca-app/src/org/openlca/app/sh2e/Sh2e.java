@@ -40,15 +40,15 @@ final class Sh2e {
 		RISK_ASSESSMENT("Risk assessment", RiskAssessment.values()),
 		BOUNDARIES("System boundaries", Boundaries.values()),
 		TECHNOLOGY_LEVEL("Technology readiness level", TechnologyLevel.values()),
-		// TODO (francois): missing word
-		OPERATING_SCALE("Operating scale", new Option[]{Option.Yes, Option.No}),
+		OPERATING_SCALE("LCI based on operating scale",
+				new Option[]{Option.Yes, Option.No}),
 		LEARNING_CURVE("Learning Curve Method", LearningCurve.values()),
 		HYDROGEN_CALORIFIC("Hydrogen net calorific value (MJ/kg)",
 				UserInput.values()),
 		HYDROGEN_PURITY("Hydrogen purity (%)", UserInput.values()),
-		HYDROGEN_TEMPERATURE("Hydrogen temperature (°C)", UserInput.values()),
+		HYDROGEN_TEMPERATURE("Hydrogen temperature (\u00B0C)", UserInput.values()),
 		HYDROGEN_PRESSURE("Hydrogen pressure (bar)", UserInput.values()),
-		HYDROGEN_CAPACITY("Operating production capacity (kg H2/year)",
+		HYDROGEN_CAPACITY("Operating production capacity (kg H\u2082/year)",
 				UserInput.values()),
 		FUNCTIONAL_UNIT("Functional unit", FunctionalUnit.values()),
 		CCS("Carbon capture and storage	", CSS.values()),
@@ -57,10 +57,10 @@ final class Sh2e {
 		COMPARATIVE_LCA("Comparative LCA", ComparativeLCA.values()),
 		USE_PURPOSE("Use purpose", UsePurpose.values()),
 		VEHICLE_LIFETIME("Vehicle lifetime (years)", UserInput.values()),
-		VEHICLE_COMSUMPTION("Vehicle consumption (kg H2/100km)",
+		VEHICLE_COMSUMPTION("Vehicle consumption (kg H\u2082/100km)",
 				UserInput.values()),
 		FUEL_PURITY("Fuel or chemical purity (%)", UserInput.values()),
-		FUEL_TEMPERATURE("Fuel or chemical temperature (°C)", UserInput.values()),
+		FUEL_TEMPERATURE("Fuel or chemical temperature (\u00B0C)", UserInput.values()),
 		FUEL_PRESSURE("Fuel or chemical pressure (kPa)", UserInput.values()),
 		FUEL_CALORIFIC("Fuel net calorific value (MJ/kg)",
 				UserInput.values());
@@ -348,8 +348,8 @@ final class Sh2e {
 
 	public enum FunctionalUnit implements Option {
 
-		KG_H2("kg of H2"),
-		MJ_H2("MJ (LHV) of H2"),
+		KG_H2("kg of H\u2082"),
+		MJ_H2("MJ (LHV) of H\u2082"),
 
 		KM("km travelled"),
 		PASSENGER_LOAD("passenger load (p.km)"),
@@ -388,7 +388,7 @@ final class Sh2e {
 
 		ELECTRICITY("Electricity production"),
 
-		HEAT("Heat production"),
+		COGENERATION("Cogeneration"),
 
 		NONE("None");
 

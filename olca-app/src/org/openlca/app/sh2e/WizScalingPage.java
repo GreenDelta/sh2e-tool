@@ -35,11 +35,9 @@ class WizScalingPage extends WizardPage {
 		Runnable checkState = () -> setPageComplete(
 				operatingScale != null && learningCurve != null);
 
-		// TODO (francois): missing word
 		var scaleGroup = OptionGroup.of(
 				Sh2e.Scope.OPERATING_SCALE,
-				"Is the life cycle inventory according to the considered operating "
-				+ "scale? (MISSING WORD)");
+				"Is the life cycle inventory considered based on the operating scale?");
 		scaleGroup.renderOn(body).onSelect(option -> {
 			operatingScale = option;
 			checkState.run();
