@@ -166,7 +166,7 @@ public class Editors {
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			try {
 				var page = getActivePage();
-				if(page == null)
+				if (page == null)
 					return Status.CANCEL_STATUS;
 				page.openEditor(input, editorId);
 				return Status.OK_STATUS;
