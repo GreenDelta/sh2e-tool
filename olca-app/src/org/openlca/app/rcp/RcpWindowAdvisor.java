@@ -9,8 +9,8 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.openlca.app.App;
 import org.openlca.app.Config;
 import org.openlca.app.db.Database;
-import org.openlca.app.editors.StartPage;
 import org.openlca.app.preferences.Preferences;
+import org.openlca.app.sh2e.StartPage;
 import org.openlca.app.util.ErrorReporter;
 
 public class RcpWindowAdvisor extends WorkbenchWindowAdvisor {
