@@ -20,6 +20,8 @@ import org.openlca.app.results.contributions.TagResultPage;
 import org.openlca.app.results.contributions.locations.LocationPage;
 import org.openlca.app.results.grouping.GroupPage;
 import org.openlca.app.results.impacts.ImpactTreePage;
+import org.openlca.app.sh2e.slca.SocialRiskResult;
+import org.openlca.app.sh2e.slca.ui.SocialResultPage;
 import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.MemoryError;
@@ -44,16 +46,17 @@ public class ResultEditor extends FormEditor {
 	public CalculationSetup setup;
 	public DQResult dqResult;
 	public ResultItemOrder items;
+	private SocialRiskResult socialResult;
 
-	public static void open(CalculationSetup setup, LcaResult result) {
-		open(setup, result, null);
-	}
-
-	public static void open(CalculationSetup setup, LcaResult result,
-													DQResult dqResult) {
+	public static void open(
+			CalculationSetup setup,
+			LcaResult result,
+			DQResult dqResult,
+			SocialRiskResult socialResult) {
 		var input = ResultEditorInput
 				.create(setup, result)
-				.with(dqResult);
+				.with(dqResult)
+				.with(socialResult);
 		Editors.open(input, ResultEditor.ID);
 	}
 
@@ -66,6 +69,10 @@ public class ResultEditor extends FormEditor {
 		result = Cache.getAppCache().remove(inp.resultKey, LcaResult.class);
 		if (inp.dqResultKey != null) {
 			dqResult = Cache.getAppCache().remove(inp.dqResultKey, DQResult.class);
+		}
+		if (inp.socialResultKey != null) {
+			socialResult = Cache.getAppCache()
+					.remove(inp.socialResultKey, SocialRiskResult.class);
 		}
 		setup = Cache.getAppCache().remove(inp.setupKey, CalculationSetup.class);
 		items = ResultItemOrder.of(result);
@@ -88,6 +95,9 @@ public class ResultEditor extends FormEditor {
 				addPage(new ImpactTreePage(this));
 			if (result.hasImpacts() && setup.nwSet() != null)
 				addPage(new NwResultPage(this));
+			if (socialResult != null) {
+				addPage(new SocialResultPage(this, socialResult));
+			}
 			addPage(new ProcessResultPage(this));
 			addPage(new ContributionTreePage(this));
 			addPage(new GroupPage(this));
@@ -170,9 +180,10 @@ public class ResultEditor extends FormEditor {
 	static class ResultEditorInput implements IEditorInput {
 
 		private final String name;
-		public final String resultKey;
-		public final String setupKey;
-		public String dqResultKey;
+		private final String resultKey;
+		private final String setupKey;
+		private String dqResultKey;
+		private String socialResultKey;
 
 		private ResultEditorInput(
 				String name, String resultKey, String setupKey) {
@@ -190,12 +201,17 @@ public class ResultEditor extends FormEditor {
 			return new ResultEditorInput(name, resultKey, setupKey);
 		}
 
-		/**
-		 * With data quality
-		 */
 		public ResultEditorInput with(DQResult dqResult) {
-			if (dqResult != null)
+			if (dqResult != null) {
 				dqResultKey = Cache.getAppCache().put(dqResult);
+			}
+			return this;
+		}
+
+		public ResultEditorInput with(SocialRiskResult socialResult) {
+			if (socialResult != null) {
+				socialResultKey = Cache.getAppCache().put(socialResult);
+			}
 			return this;
 		}
 
