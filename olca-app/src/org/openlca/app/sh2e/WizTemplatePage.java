@@ -98,8 +98,8 @@ class WizTemplatePage extends WizardPage {
 
 		if (list.getItemCount() == 1) {
 			list.select(0);
+			selected = templates.get(0);
 		}
-
 		setPageComplete(list.getItemCount() < 2);
 	}
 
