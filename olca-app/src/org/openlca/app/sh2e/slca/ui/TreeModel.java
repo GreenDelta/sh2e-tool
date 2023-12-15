@@ -10,6 +10,7 @@ import org.openlca.core.database.CategoryDao;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.model.Category;
 import org.openlca.core.model.ModelType;
+import org.openlca.core.model.SocialIndicator;
 import org.openlca.core.model.descriptors.SocialIndicatorDescriptor;
 import org.openlca.util.Strings;
 
@@ -56,11 +57,11 @@ class TreeModel implements ITreeContentProvider {
 				.filter(this::hasChildren)
 				.map(CategoryNode::new)
 				.sorted();
-		var indicators = categoryIndex.get(null);
+		var indicators = categoryIndex.get(root);
 		if (indicators == null || indicators.isEmpty())
 			return cxs.toArray();
 		var ixs = indicators.stream()
-				.map(IndicatorNode::new)
+				.map(i -> IndicatorNode.of(i, db))
 				.sorted();
 		return Stream.concat(cxs, ixs).toArray();
 	}
@@ -95,6 +96,10 @@ class TreeModel implements ITreeContentProvider {
 
 		Image icon();
 
+		default String variable() {
+			return null;
+		}
+
 		@Override
 		default int compareTo(Node other) {
 			return other != null
@@ -116,8 +121,15 @@ class TreeModel implements ITreeContentProvider {
 		}
 	}
 
-	private record IndicatorNode(SocialIndicatorDescriptor indicator)
-			implements Node {
+	private record IndicatorNode(
+			SocialIndicatorDescriptor descriptor,
+			SocialIndicator indicator
+	) implements Node {
+
+		static IndicatorNode of(SocialIndicatorDescriptor d, IDatabase db) {
+			var indicator = db.get(SocialIndicator.class, d.id);
+			return new IndicatorNode(d, indicator);
+		}
 
 		@Override
 		public String name() {
@@ -127,6 +139,21 @@ class TreeModel implements ITreeContentProvider {
 		@Override
 		public Image icon() {
 			return Images.get(indicator);
+		}
+
+		@Override
+		public String variable() {
+			if (indicator == null)
+				return null;
+			var u = indicator.activityUnit != null
+					? indicator.activityUnit.name
+					: null;
+			var v = indicator.activityVariable;
+			if (Strings.nullOrEmpty(u))
+				return v;
+			if (Strings.nullOrEmpty(v))
+				return u;
+			return v + " [" + u + "]";
 		}
 	}
 }
