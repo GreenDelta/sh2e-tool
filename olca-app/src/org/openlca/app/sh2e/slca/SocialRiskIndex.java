@@ -7,6 +7,7 @@ import org.openlca.core.model.descriptors.SocialIndicatorDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,10 +17,12 @@ import java.util.Set;
 
 public class SocialRiskIndex implements MatrixIndex<SocialRiskEntry> {
 
-	private final ArrayList<SocialRiskEntry> content = new ArrayList<>();
-	private final Map<SocialRiskEntry, Integer> index = new HashMap<>();
+	private final ArrayList<SocialRiskEntry> content;
+	private final Map<SocialIndicatorDescriptor, Map<RiskLevel, Integer>> index;
 
 	private SocialRiskIndex() {
+		content = new ArrayList<>();
+		index = new HashMap<>();
 	}
 
 	public static SocialRiskIndex of(List<SocialIndicatorDescriptor> ds) {
@@ -38,6 +41,10 @@ public class SocialRiskIndex implements MatrixIndex<SocialRiskEntry> {
 		return new SocialRiskIndex();
 	}
 
+	public Set<SocialIndicatorDescriptor> indicators() {
+		return Collections.unmodifiableSet(index.keySet());
+	}
+
 	@Override
 	public int size() {
 		return content.size();
@@ -51,43 +58,49 @@ public class SocialRiskIndex implements MatrixIndex<SocialRiskEntry> {
 	@Override
 	public SocialRiskEntry at(int i) {
 		return i >= 0 && i < content.size()
-			? content.get(i)
-			: null;
+				? content.get(i)
+				: null;
 	}
 
 	@Override
 	public int of(SocialRiskEntry e) {
-		if (e == null)
-			return -1;
-		var i = index.get(e);
-		return i != null ? i : -1;
+		return e != null
+				? of(e.indicator(), e.level())
+				: -1;
 	}
 
 	public int of(SocialIndicatorDescriptor d, RiskLevel r) {
 		if (d == null || r == null)
 			return -1;
-		// TODO: avoid object allocations with a smarter index structure
-		return of(SocialRiskEntry.of(d, r));
+		var m = index.get(d);
+		if (m == null)
+			return -1;
+		var v = m.get(r);
+		return v != null ? v : -1;
 	}
 
 	@Override
 	public boolean contains(SocialRiskEntry e) {
-		return of(e) >= 0;
+		return e != null && of(e) >= 0;
 	}
-
-	// TODO public void contains(SocialIndicatorDescriptor d)
 
 	@Override
 	public int add(SocialRiskEntry e) {
-		if (e == null)
+		return e != null
+				? add(e.indicator(), e.level())
+				: -1;
+	}
+
+	public int add(SocialIndicatorDescriptor d, RiskLevel level) {
+		if (d == null || level == null)
 			return -1;
-		int idx = of(e);
-		if (idx >= 0)
-			return idx;
-		idx = content.size();
-		content.add(e);
-		index.put(e, idx);
-		return idx;
+		var m = index.computeIfAbsent(d, $ -> new EnumMap<>(RiskLevel.class));
+		return m.computeIfAbsent(level, $ -> {
+			int i = content.size();
+			var entry = SocialRiskEntry.of(d, level);
+			content.add(entry);
+			return i;
+		});
 	}
 
 	@Override
