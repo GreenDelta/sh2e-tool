@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Image;
 import org.openlca.app.db.Database;
 import org.openlca.app.rcp.images.Images;
 import org.openlca.app.sh2e.slca.SocialRiskResult;
+import org.openlca.app.sh2e.slca.SocialRiskValue;
 import org.openlca.app.util.Labels;
 import org.openlca.core.database.CategoryDao;
 import org.openlca.core.database.IDatabase;
@@ -61,7 +62,7 @@ class TreeModel implements ITreeContentProvider {
 		if (indicators == null || indicators.isEmpty())
 			return cxs.toArray();
 		var ixs = indicators.stream()
-				.map(i -> IndicatorNode.of(i, db))
+				.map(i -> IndicatorNode.of(db, result, i))
 				.sorted();
 		return Stream.concat(cxs, ixs).toArray();
 	}
@@ -100,6 +101,11 @@ class TreeModel implements ITreeContentProvider {
 			return null;
 		}
 
+		default SocialRiskValue value() {
+			// TODO: new default!
+			return new SocialRiskValue();
+		}
+
 		@Override
 		default int compareTo(Node other) {
 			return other != null
@@ -123,12 +129,16 @@ class TreeModel implements ITreeContentProvider {
 
 	private record IndicatorNode(
 			SocialIndicatorDescriptor descriptor,
-			SocialIndicator indicator
+			SocialIndicator indicator,
+			SocialRiskValue value
 	) implements Node {
 
-		static IndicatorNode of(SocialIndicatorDescriptor d, IDatabase db) {
+		static IndicatorNode of(
+				IDatabase db, SocialRiskResult r, SocialIndicatorDescriptor d
+		) {
+			var value = r.totalResultsOf(d);
 			var indicator = db.get(SocialIndicator.class, d.id);
-			return new IndicatorNode(d, indicator);
+			return new IndicatorNode(d, indicator, value);
 		}
 
 		@Override

@@ -17,14 +17,14 @@ public class SocialRiskResult {
 	private final MatrixReader direct;
 
 	private SocialRiskResult(
-		SocialRiskIndex index, double[] total, MatrixReader direct) {
+			SocialRiskIndex index, double[] total, MatrixReader direct) {
 		this.index = index;
 		this.total = total;
 		this.direct = direct;
 	}
 
 	public static Optional<SocialRiskResult> calculate(
-		IDatabase db, ResultProvider p
+			IDatabase db, ResultProvider p
 	) {
 		if (db == null || p == null || p.techIndex() == null)
 			return Optional.empty();
@@ -46,4 +46,12 @@ public class SocialRiskResult {
 		return index.indicators();
 	}
 
+	public SocialRiskValue totalResultsOf(SocialIndicatorDescriptor d) {
+		var v = new SocialRiskValue();
+		index.eachOf(d, (i, entry) -> {
+			double num = total[i];
+			v.put(entry.level(), num);
+		});
+		return v;
+	}
 }

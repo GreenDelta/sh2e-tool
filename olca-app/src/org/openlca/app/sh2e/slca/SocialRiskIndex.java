@@ -110,6 +110,23 @@ public class SocialRiskIndex implements MatrixIndex<SocialRiskEntry> {
 		}
 	}
 
+	public void eachOf(
+			SocialIndicatorDescriptor d, IndexConsumer<SocialRiskEntry> fn) {
+		if (d == null || fn == null)
+			return;
+		var m = index.get(d);
+		if (m == null)
+			return;
+		for (var v : m.values()) {
+			if (v == null)
+				continue;
+			int i = v;
+			if (i < 0 || i >= content.size())
+				continue;
+			fn.accept(i, content.get(i));
+		}
+	}
+
 	@Override
 	public Set<SocialRiskEntry> content() {
 		return new HashSet<>(content);

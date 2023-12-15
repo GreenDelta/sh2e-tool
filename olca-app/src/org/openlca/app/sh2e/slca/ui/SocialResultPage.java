@@ -36,10 +36,11 @@ public class SocialResultPage extends FormPage {
 		var comp = UI.sectionClient(section, tk, 1);
 		UI.gridData(section, true, true);
 
-		var headers = new String[12];
+		var levels = RiskLevel.values();
+		var headers = new String[2 + levels.length];
 		headers[0] = "";
 		headers[1] = "Activity variable";
-		for (var rl : RiskLevel.values()) {
+		for (var rl : levels) {
 			int col = TreeGrid.columnOf(rl);
 			if (col < 0 || col >= headers.length)
 				continue;
@@ -51,16 +52,16 @@ public class SocialResultPage extends FormPage {
 		widths[0] = 0.3;
 		widths[1] = 0.2;
 		for (int i = 2; i < widths.length; i++) {
-			widths[i] = 0.5 / (widths.length - 2);
+			widths[i] = 0.5 / levels.length;
 		}
 		Trees.bindColumnWidths(tree.getTree(), widths);
 
-		for (var level : RiskLevel.values()) {
+		for (var level : levels) {
 			int col = TreeGrid.columnOf(level);
 			var t = tree.getTree();
 			if (col < 0 || col >= t.getColumnCount())
 				continue;
-			t.getColumn(col).setToolTipText(TreeGrid.tooltipOf(level));
+			t.getColumn(col).setToolTipText(Labels.of(level));
 		}
 
 		tree.setLabelProvider(new TreeLabel());
