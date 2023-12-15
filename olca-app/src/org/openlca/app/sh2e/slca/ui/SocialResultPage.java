@@ -113,8 +113,9 @@ public class SocialResultPage extends FormPage {
 			if (level == null)
 				return null;
 			var share = n.value().getShare(level);
-			int alpha = (int) (255.0 * (1 - share));
-			return TreeGrid.colorOf(level, alpha);
+			return share >= 0.75
+					? TreeGrid.colorOf(level)
+					: null;
 		}
 	}
 }

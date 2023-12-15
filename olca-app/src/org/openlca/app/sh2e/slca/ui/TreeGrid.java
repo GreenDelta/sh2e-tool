@@ -2,7 +2,6 @@ package org.openlca.app.sh2e.slca.ui;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.RGBA;
 import org.openlca.app.util.Colors;
 import org.openlca.core.model.RiskLevel;
 
@@ -66,20 +65,20 @@ class TreeGrid {
 		};
 	}
 
-	static Color colorOf(RiskLevel level, int alpha) {
+	static Color colorOf(RiskLevel level) {
 		if (level == null)
-			return colorOf(RiskLevel.NOT_APPLICABLE, alpha);
-		var rgba = switch (level) {
-			case HIGH_OPPORTUNITY -> new RGBA(0, 105, 92, alpha);
-			case MEDIUM_OPPORTUNITY -> new RGBA(38, 166, 154, alpha);
-			case LOW_OPPORTUNITY -> new RGBA(128, 203, 196, alpha);
-			case VERY_LOW_RISK -> new RGBA(244, 143, 177, alpha);
-			case LOW_RISK -> new RGBA(240, 98, 146, alpha);
-			case MEDIUM_RISK -> new RGBA(233, 30, 99, alpha);
-			case HIGH_RISK -> new RGBA(194, 24, 91, alpha);
-			case VERY_HIGH_RISK -> new RGBA(136, 14, 79, alpha);
-			default -> new RGBA(96, 125, 139, alpha);
+			return colorOf(RiskLevel.NOT_APPLICABLE);
+		var rgb = switch (level) {
+			case HIGH_OPPORTUNITY -> new RGB(0, 105, 92);
+			case MEDIUM_OPPORTUNITY -> new RGB(38, 166, 154);
+			case LOW_OPPORTUNITY -> new RGB(128, 203, 196);
+			case VERY_LOW_RISK -> new RGB(244, 143, 177);
+			case LOW_RISK -> new RGB(240, 98, 146);
+			case MEDIUM_RISK -> new RGB(233, 30, 99);
+			case HIGH_RISK -> new RGB(194, 24, 91);
+			case VERY_HIGH_RISK -> new RGB(136, 14, 79);
+			default -> new RGB(96, 125, 139);
 		};
-		return Colors.get(rgba);
+		return Colors.get(rgb);
 	}
 }
