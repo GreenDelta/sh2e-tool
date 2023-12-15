@@ -1,7 +1,9 @@
 package org.openlca.app.sh2e.slca.ui;
 
 import org.eclipse.jface.viewers.BaseLabelProvider;
+import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
@@ -10,6 +12,7 @@ import org.openlca.app.results.ResultEditor;
 import org.openlca.app.sh2e.slca.SocialRiskResult;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
 import org.openlca.app.util.Labels;
+import org.openlca.app.util.Numbers;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.trees.Trees;
 import org.openlca.core.model.RiskLevel;
@@ -71,7 +74,7 @@ public class SocialResultPage extends FormPage {
 	}
 
 	private static class TreeLabel extends BaseLabelProvider
-			implements ITableLabelProvider {
+			implements ITableLabelProvider, ITableColorProvider {
 
 		@Override
 		public Image getColumnImage(Object obj, int col) {
@@ -87,8 +90,31 @@ public class SocialResultPage extends FormPage {
 			return switch (col) {
 				case 0 -> n.name();
 				case 1 -> n.variable();
-				default -> null;
+				default -> {
+					var level = TreeGrid.levelOf(col);
+					if (level == null)
+						yield null;
+					var value = n.value().get(level);
+					yield Numbers.format(value, 2);
+				}
 			};
+		}
+
+		@Override
+		public Color getForeground(Object obj, int col) {
+			return null;
+		}
+
+		@Override
+		public Color getBackground(Object obj, int col) {
+			if (col < 2 || !(obj instanceof Node n))
+				return null;
+			var level = TreeGrid.levelOf(col);
+			if (level == null)
+				return null;
+			var share = n.value().getShare(level);
+			int alpha = (int) (255.0 * (1 - share));
+			return TreeGrid.colorOf(level, alpha);
 		}
 	}
 }
