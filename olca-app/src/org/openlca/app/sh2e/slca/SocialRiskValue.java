@@ -11,10 +11,22 @@ public class SocialRiskValue {
 
 	private final double[] values = new double[N];
 
-	void put(RiskLevel level, double value) {
+	public int size() {
+		return N;
+	}
+
+	public void put(RiskLevel level, double value) {
 		if (level == null)
 			return;
 		values[level.ordinal()] = value;
+	}
+
+	public void put(int level, double value) {
+		values[level] = value;
+	}
+
+	public void add(int level, double value) {
+		values[level] += value;
 	}
 
 	public double get(RiskLevel level) {
@@ -23,9 +35,17 @@ public class SocialRiskValue {
 				: 0;
 	}
 
+	public double get(int level) {
+		return values[level];
+	}
+
 	public double getShare(RiskLevel level) {
-		if (level == null)
-			return 0;
+		return level != null
+				? getShare(level.ordinal())
+				: 0;
+	}
+
+	public double getShare(int level) {
 		double s = sum();
 		return s != 0
 				? Math.abs(get(level) / s)

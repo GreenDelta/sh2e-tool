@@ -95,10 +95,7 @@ class TreeModel implements ITreeContentProvider {
 			return null;
 		}
 
-		default SocialRiskValue value() {
-			// TODO: new default!
-			return new SocialRiskValue();
-		}
+		SocialRiskValue value();
 	}
 
 	static class CategoryNode implements Node {
@@ -106,6 +103,7 @@ class TreeModel implements ITreeContentProvider {
 		private final TreeModel tree;
 		private final Category category;
 		private List<Node> _childs;
+		private SocialRiskValue _value;
 
 		CategoryNode(TreeModel tree, Category category) {
 			this.tree = tree;
@@ -139,6 +137,20 @@ class TreeModel implements ITreeContentProvider {
 				_childs.add(IndicatorNode.of(tree, i));
 			}
 			return _childs;
+		}
+
+		@Override
+		public SocialRiskValue value() {
+			if (_value != null)
+				return _value;
+			_value = new SocialRiskValue();
+			for (var c : childs()) {
+				var cv = c.value();
+				for (int i = 0; i < cv.size(); i++) {
+					_value.add(i, cv.getShare(i));
+				}
+			}
+			return _value;
 		}
 	}
 
