@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.openlca.app.sh2e.slca.ui.TreeModel.CategoryNode;
 import org.openlca.app.sh2e.slca.ui.TreeModel.IndicatorNode;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
+import org.openlca.app.sh2e.slca.ui.TreeModel.TechFlowNode;
 import org.openlca.util.Strings;
 
 public class TreeSorter extends ViewerComparator {
@@ -15,6 +16,8 @@ public class TreeSorter extends ViewerComparator {
 			return 0;
 		if (element instanceof IndicatorNode)
 			return 1;
+		if (element instanceof TechFlowNode)
+			return 2;
 		return 42;
 	}
 
@@ -25,9 +28,10 @@ public class TreeSorter extends ViewerComparator {
 		if (cat1 != cat2) {
 			return cat1 - cat2;
 		}
-		if (e1 instanceof Node n1 && e2 instanceof Node n2) {
+		if (e1 instanceof TechFlowNode t1 && e2 instanceof TechFlowNode t2)
+			return Double.compare(t2.activityValue(), t1.activityValue());
+		if (e1 instanceof Node n1 && e2 instanceof Node n2)
 			return Strings.compare(n1.name(), n2.name());
-		}
 		return super.compare(viewer, e1, e2);
 	}
 }

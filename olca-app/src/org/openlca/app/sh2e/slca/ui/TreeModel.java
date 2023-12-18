@@ -224,6 +224,7 @@ class TreeModel implements ITreeContentProvider {
 
 		private final IndicatorNode parent;
 		private final TechFlow techFlow;
+		private double activityShare;
 		private SocialRiskValue _riskValue;
 
 		TechFlowNode(IndicatorNode parent, TechFlow techFlow) {
@@ -234,20 +235,33 @@ class TreeModel implements ITreeContentProvider {
 		static List<TechFlowNode> allOf(IndicatorNode parent) {
 			if (parent == null)
 				return List.of();
-			var av = parent.activityValue();
-			if (av == 0)
+			var pav = Math.abs(parent.activityValue());
+			if (pav == 0)
 				return List.of();
 
+			double maxAv = 0;
 			var nodes = new ArrayList<TechFlowNode>();
 			for (var techFlow : parent.tree.result.techIndex()) {
 				var node = new TechFlowNode(parent, techFlow);
+				var av = Math.abs(node.activityValue());
+				maxAv = Math.max(av, maxAv);
 				// TODO: read the min-share from the tree config
-				var share = Math.abs(node.activityValue() / av);
-				if (share >= 0.0001) {
+				var share = av / pav;
+				if (share >= 0.001) {
 					nodes.add(node);
 				}
 			}
+
+			if (maxAv > 0) {
+				for (var n : nodes) {
+					n.activityShare = Math.abs(n.activityValue()) / maxAv;
+				}
+			}
 			return nodes;
+		}
+
+		public double activityShare() {
+			return activityShare;
 		}
 
 		private SocialResult result() {
@@ -274,6 +288,11 @@ class TreeModel implements ITreeContentProvider {
 				_riskValue.put(level, activityValue());
 			}
 			return _riskValue;
+		}
+
+		@Override
+		public String activityVariable() {
+			return parent.activityVariable();
 		}
 
 		@Override

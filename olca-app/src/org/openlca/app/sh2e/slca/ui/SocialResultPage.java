@@ -7,11 +7,14 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
+import org.openlca.app.components.ContributionImage;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.results.ResultEditor;
 import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.sh2e.slca.ui.TreeModel.CategoryNode;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
+import org.openlca.app.sh2e.slca.ui.TreeModel.TechFlowNode;
+import org.openlca.app.util.Colors;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.Numbers;
 import org.openlca.app.util.UI;
@@ -47,8 +50,8 @@ public class SocialResultPage extends FormPage {
 		var levels = RiskLevel.values();
 		var headers = new String[3 + levels.length];
 		headers[0] = "";
-		headers[1] = "Activity variable";
-		headers[2] = "Activity value";
+		headers[1] = "Activity value";
+		headers[2] = "Raw value";
 		for (var rl : levels) {
 			int col = TreeGrid.columnOf(rl);
 			if (col < 0 || col >= headers.length)
@@ -84,14 +87,28 @@ public class SocialResultPage extends FormPage {
 	private static class TreeLabel extends BaseLabelProvider
 			implements ITableLabelProvider, ITableColorProvider {
 
+		private final ContributionImage img = new ContributionImage();
 		private final DecimalFormat percentage = new DecimalFormat(
 				"#0%", new DecimalFormatSymbols(Locale.US));
+
+		@Override
+		public void dispose() {
+			img.dispose();
+			super.dispose();
+		}
 
 		@Override
 		public Image getColumnImage(Object obj, int col) {
 			if (!(obj instanceof Node n))
 				return null;
-			return col == 0 ? n.icon() : null;
+			if (col == 0)
+				return n.icon();
+			if (col == 1) {
+				return n instanceof TechFlowNode t
+						? img.get(t.activityShare())
+						: img.get(1, Colors.background());
+			}
+			return null;
 		}
 
 		@Override
@@ -100,10 +117,15 @@ public class SocialResultPage extends FormPage {
 				return null;
 			return switch (col) {
 				case 0 -> n.name();
-				case 1 -> n.activityVariable();
-				case 2 -> n instanceof CategoryNode
-						? null
-						: Numbers.format(n.activityValue());
+				case 1 -> {
+					if (n instanceof CategoryNode)
+						yield null;
+					var a = n.activityVariable();
+					yield a != null
+							? Numbers.format(n.activityValue()) + " " + a
+							: null;
+				}
+				case 2 -> null;
 				default -> {
 					var level = TreeGrid.levelOf(col);
 					if (level == null)
