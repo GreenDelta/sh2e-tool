@@ -119,8 +119,9 @@ public class SocialResultPage extends FormPage {
 			var level = TreeGrid.levelOf(col);
 			if (level == null)
 				return null;
+
 			var share = n.value().getShare(level);
-			return share >= 0.50
+			return share >= 0.005
 					? TreeGrid.colorOf(level)
 					: null;
 		}

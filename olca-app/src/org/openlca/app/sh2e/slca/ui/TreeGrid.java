@@ -69,14 +69,26 @@ class TreeGrid {
 		if (level == null)
 			return colorOf(RiskLevel.NOT_APPLICABLE);
 		var rgb = switch (level) {
-			case HIGH_OPPORTUNITY -> new RGB(0, 105, 92);
-			case MEDIUM_OPPORTUNITY -> new RGB(38, 166, 154);
-			case LOW_OPPORTUNITY -> new RGB(128, 203, 196);
+			/*
+			 case HIGH_OPPORTUNITY -> new RGB(0, 105, 92);
+			 case MEDIUM_OPPORTUNITY -> new RGB(38, 166, 154);
+			 case LOW_OPPORTUNITY -> new RGB(128, 203, 196);
+			*/
+			case HIGH_OPPORTUNITY,
+					MEDIUM_OPPORTUNITY,
+					LOW_OPPORTUNITY -> new RGB(38, 166, 154);
+			/*
 			case VERY_LOW_RISK -> new RGB(244, 143, 177);
 			case LOW_RISK -> new RGB(240, 98, 146);
 			case MEDIUM_RISK -> new RGB(233, 30, 99);
 			case HIGH_RISK -> new RGB(194, 24, 91);
 			case VERY_HIGH_RISK -> new RGB(136, 14, 79);
+			*/
+			case VERY_LOW_RISK,
+					LOW_RISK,
+					MEDIUM_RISK,
+					HIGH_RISK,
+					VERY_HIGH_RISK -> new RGB(233, 30, 99);
 			default -> new RGB(96, 125, 139);
 		};
 		return Colors.get(rgb);
