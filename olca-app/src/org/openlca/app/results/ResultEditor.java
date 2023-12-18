@@ -20,7 +20,7 @@ import org.openlca.app.results.contributions.TagResultPage;
 import org.openlca.app.results.contributions.locations.LocationPage;
 import org.openlca.app.results.grouping.GroupPage;
 import org.openlca.app.results.impacts.ImpactTreePage;
-import org.openlca.app.sh2e.slca.SocialRiskResult;
+import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.sh2e.slca.ui.SocialResultPage;
 import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.Labels;
@@ -46,13 +46,13 @@ public class ResultEditor extends FormEditor {
 	public CalculationSetup setup;
 	public DQResult dqResult;
 	public ResultItemOrder items;
-	private SocialRiskResult socialResult;
+	private SocialResult socialResult;
 
 	public static void open(
 			CalculationSetup setup,
 			LcaResult result,
 			DQResult dqResult,
-			SocialRiskResult socialResult) {
+			SocialResult socialResult) {
 		var input = ResultEditorInput
 				.create(setup, result)
 				.with(dqResult)
@@ -72,7 +72,7 @@ public class ResultEditor extends FormEditor {
 		}
 		if (inp.socialResultKey != null) {
 			socialResult = Cache.getAppCache()
-					.remove(inp.socialResultKey, SocialRiskResult.class);
+					.remove(inp.socialResultKey, SocialResult.class);
 		}
 		setup = Cache.getAppCache().remove(inp.setupKey, CalculationSetup.class);
 		items = ResultItemOrder.of(result);
@@ -208,7 +208,7 @@ public class ResultEditor extends FormEditor {
 			return this;
 		}
 
-		public ResultEditorInput with(SocialRiskResult socialResult) {
+		public ResultEditorInput with(SocialResult socialResult) {
 			if (socialResult != null) {
 				socialResultKey = Cache.getAppCache().put(socialResult);
 			}

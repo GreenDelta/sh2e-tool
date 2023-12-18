@@ -18,7 +18,7 @@ record SocialMatrixData(
 		SocialLevelMatrix levelData
 ) {
 
-	Optional<SocialMatrixData> build(
+	static Optional<SocialMatrixData> fetch(
 			IDatabase db, TechIndex techIndex, SocialIndex socialIndex
 	) {
 		if (db == null

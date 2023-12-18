@@ -9,7 +9,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.results.ResultEditor;
-import org.openlca.app.sh2e.slca.SocialRiskResult;
+import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.UI;
@@ -23,9 +23,9 @@ import java.util.Locale;
 public class SocialResultPage extends FormPage {
 
 	private final ResultEditor editor;
-	private final SocialRiskResult result;
+	private final SocialResult result;
 
-	public SocialResultPage(ResultEditor editor, SocialRiskResult result) {
+	public SocialResultPage(ResultEditor editor, SocialResult result) {
 		super(editor, "SocialResultPage", "Social assessment");
 		this.editor = editor;
 		this.result = result;

@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.graphics.Image;
 import org.openlca.app.db.Database;
 import org.openlca.app.rcp.images.Images;
-import org.openlca.app.sh2e.slca.SocialRiskResult;
+import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.sh2e.slca.SocialRiskValue;
 import org.openlca.app.util.Labels;
 import org.openlca.core.database.CategoryDao;
@@ -23,11 +23,11 @@ import java.util.stream.Stream;
 
 class TreeModel implements ITreeContentProvider {
 
-	private final SocialRiskResult result;
+	private final SocialResult result;
 	private final IDatabase db;
 	private final Map<Long, List<SocialIndicatorDescriptor>> categoryIndex;
 
-	TreeModel(SocialRiskResult result) {
+	TreeModel(SocialResult result) {
 		this.result = result;
 		this.db = Database.get();
 		categoryIndex = new HashMap<>();
@@ -163,7 +163,7 @@ class TreeModel implements ITreeContentProvider {
 		static IndicatorNode of(
 				TreeModel tree, SocialIndicatorDescriptor d
 		) {
-			var value = tree.result.totalResultsOf(d);
+			var value = tree.result.riskValueOf(d);
 			var indicator = tree.db.get(SocialIndicator.class, d.id);
 			return new IndicatorNode(d, indicator, value);
 		}

@@ -17,7 +17,7 @@ import org.openlca.app.editors.Editors;
 import org.openlca.app.editors.ModelEditorInput;
 import org.openlca.app.results.ResultEditor;
 import org.openlca.app.results.simulation.SimulationEditor;
-import org.openlca.app.sh2e.slca.SocialRiskResult;
+import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.MemoryError;
 import org.openlca.app.util.MsgBox;
@@ -147,7 +147,7 @@ public class CalculationWizard extends Wizard {
 					Database.get(), setup.dqSetup, result.provider());
 		}
 
-		var socialResult = SocialRiskResult
+		var socialResult = SocialResult
 				.calculate(Database.get(), result.provider())
 				.orElse(null);
 
