@@ -94,4 +94,13 @@ public class SocialResult {
 		});
 		return v;
 	}
+
+	public double activityValueOf(SocialIndicatorDescriptor d) {
+		if (d == null)
+			return 0;
+		int i = data.socialIndex().of(d);
+		return i >= 0
+				? totalActivityValues[i]
+				: 0;
+	}
 }

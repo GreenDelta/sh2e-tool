@@ -91,11 +91,15 @@ class TreeModel implements ITreeContentProvider {
 
 		Image icon();
 
-		default String variable() {
+		default String activityVariable() {
 			return null;
 		}
 
-		SocialRiskValue value();
+		default Double activityValue() {
+			return null;
+		}
+
+		SocialRiskValue riskValue();
 	}
 
 	static class CategoryNode implements Node {
@@ -140,12 +144,12 @@ class TreeModel implements ITreeContentProvider {
 		}
 
 		@Override
-		public SocialRiskValue value() {
+		public SocialRiskValue riskValue() {
 			if (_value != null)
 				return _value;
 			_value = new SocialRiskValue();
 			for (var c : childs()) {
-				var cv = c.value();
+				var cv = c.riskValue();
 				for (int i = 0; i < cv.size(); i++) {
 					_value.add(i, cv.getShare(i));
 				}
@@ -157,15 +161,17 @@ class TreeModel implements ITreeContentProvider {
 	record IndicatorNode(
 			SocialIndicatorDescriptor descriptor,
 			SocialIndicator indicator,
-			SocialRiskValue value
+			SocialRiskValue riskValue,
+			Double activityValue
 	) implements Node {
 
 		static IndicatorNode of(
 				TreeModel tree, SocialIndicatorDescriptor d
 		) {
-			var value = tree.result.riskValueOf(d);
+			var riskValue = tree.result.riskValueOf(d);
 			var indicator = tree.db.get(SocialIndicator.class, d.id);
-			return new IndicatorNode(d, indicator, value);
+			var activityValue = tree.result.activityValueOf(d);
+			return new IndicatorNode(d, indicator, riskValue, activityValue);
 		}
 
 		@Override
@@ -179,7 +185,7 @@ class TreeModel implements ITreeContentProvider {
 		}
 
 		@Override
-		public String variable() {
+		public String activityVariable() {
 			if (indicator == null)
 				return null;
 			var u = indicator.activityUnit != null

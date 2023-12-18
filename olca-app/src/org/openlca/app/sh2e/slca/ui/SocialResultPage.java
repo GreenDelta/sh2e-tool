@@ -12,6 +12,7 @@ import org.openlca.app.results.ResultEditor;
 import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
 import org.openlca.app.util.Labels;
+import org.openlca.app.util.Numbers;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.trees.Trees;
 import org.openlca.core.model.RiskLevel;
@@ -43,9 +44,10 @@ public class SocialResultPage extends FormPage {
 		UI.gridData(section, true, true);
 
 		var levels = RiskLevel.values();
-		var headers = new String[2 + levels.length];
+		var headers = new String[3 + levels.length];
 		headers[0] = "";
 		headers[1] = "Activity variable";
+		headers[2] = "Activity value";
 		for (var rl : levels) {
 			int col = TreeGrid.columnOf(rl);
 			if (col < 0 || col >= headers.length)
@@ -55,9 +57,10 @@ public class SocialResultPage extends FormPage {
 		var tree = Trees.createViewer(comp, headers);
 
 		double[] widths = new double[headers.length];
-		widths[0] = 0.3;
-		widths[1] = 0.2;
-		for (int i = 2; i < widths.length; i++) {
+		widths[0] = 0.2;
+		widths[1] = 0.15;
+		widths[2] = 0.15;
+		for (int i = 3; i < widths.length; i++) {
 			widths[i] = 0.5 / levels.length;
 		}
 		Trees.bindColumnWidths(tree.getTree(), widths);
@@ -96,12 +99,18 @@ public class SocialResultPage extends FormPage {
 				return null;
 			return switch (col) {
 				case 0 -> n.name();
-				case 1 -> n.variable();
+				case 1 -> n.activityVariable();
+				case 2 -> {
+					var av = n.activityValue();
+					yield av != null
+							? Numbers.format(av)
+							: null;
+				}
 				default -> {
 					var level = TreeGrid.levelOf(col);
 					if (level == null)
 						yield null;
-					var value = n.value().getShare(level);
+					var value = n.riskValue().getShare(level);
 					yield percentage.format(value);
 				}
 			};
@@ -120,7 +129,7 @@ public class SocialResultPage extends FormPage {
 			if (level == null)
 				return null;
 
-			var share = n.value().getShare(level);
+			var share = n.riskValue().getShare(level);
 			return share >= 0.005
 					? TreeGrid.colorOf(level)
 					: null;

@@ -7,7 +7,7 @@ import org.openlca.core.model.RiskLevel;
 
 class TreeGrid {
 
-	private static final int OFFSET = 2;
+	private static final int OFFSET = 3;
 
 	static RiskLevel levelOf(int col) {
 		return switch (col - OFFSET) {
