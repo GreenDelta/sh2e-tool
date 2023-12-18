@@ -9,6 +9,7 @@ import org.openlca.app.sh2e.slca.SocialRiskValue;
 import org.openlca.app.util.Labels;
 import org.openlca.core.database.CategoryDao;
 import org.openlca.core.database.IDatabase;
+import org.openlca.core.matrix.index.TechFlow;
 import org.openlca.core.model.Category;
 import org.openlca.core.model.ModelType;
 import org.openlca.core.model.SocialIndicator;
@@ -50,15 +51,17 @@ class TreeModel implements ITreeContentProvider {
 		if (indicators == null || indicators.isEmpty())
 			return cxs.toArray();
 		var ixs = indicators.stream()
-				.map(i -> IndicatorNode.of(this, i));
+				.map(i -> new IndicatorNode(this, i));
 		return Stream.concat(cxs, ixs).toArray();
 	}
 
 	@Override
 	public Object[] getChildren(Object obj) {
-		return obj instanceof CategoryNode cn
-				? cn.childs().toArray(new Node[0])
-				: new Object[0];
+		if (obj instanceof CategoryNode cn)
+			return cn.childs().toArray(new Node[0]);
+		if (obj instanceof IndicatorNode n)
+			return n.childs().toArray(new Node[0]);
+		return new Object[0];
 	}
 
 	@Override
@@ -82,7 +85,7 @@ class TreeModel implements ITreeContentProvider {
 			return false;
 		}
 
-		return false;
+		return obj instanceof IndicatorNode;
 	}
 
 	interface Node {
@@ -95,8 +98,8 @@ class TreeModel implements ITreeContentProvider {
 			return null;
 		}
 
-		default Double activityValue() {
-			return null;
+		default double activityValue() {
+			return 0;
 		}
 
 		SocialRiskValue riskValue();
@@ -138,7 +141,7 @@ class TreeModel implements ITreeContentProvider {
 			if (indicators == null)
 				return _childs;
 			for (var i : indicators) {
-				_childs.add(IndicatorNode.of(tree, i));
+				_childs.add(new IndicatorNode(tree, i));
 			}
 			return _childs;
 		}
@@ -158,20 +161,20 @@ class TreeModel implements ITreeContentProvider {
 		}
 	}
 
-	record IndicatorNode(
-			SocialIndicatorDescriptor descriptor,
-			SocialIndicator indicator,
-			SocialRiskValue riskValue,
-			Double activityValue
-	) implements Node {
+	static class IndicatorNode implements Node {
 
-		static IndicatorNode of(
-				TreeModel tree, SocialIndicatorDescriptor d
-		) {
-			var riskValue = tree.result.riskValueOf(d);
-			var indicator = tree.db.get(SocialIndicator.class, d.id);
-			var activityValue = tree.result.activityValueOf(d);
-			return new IndicatorNode(d, indicator, riskValue, activityValue);
+		private final TreeModel tree;
+		private final SocialIndicatorDescriptor descriptor;
+		private final SocialIndicator indicator;
+		private final SocialRiskValue riskValue;
+
+		private List<TechFlowNode> _childs;
+
+		IndicatorNode(TreeModel tree, SocialIndicatorDescriptor d) {
+			this.tree = tree;
+			this.descriptor = d;
+			this.indicator = tree.db.get(SocialIndicator.class, d.id);
+			this.riskValue = tree.result.riskValueOf(d);
 		}
 
 		@Override
@@ -182,6 +185,13 @@ class TreeModel implements ITreeContentProvider {
 		@Override
 		public Image icon() {
 			return Images.get(indicator);
+		}
+
+		List<TechFlowNode> childs() {
+			if (_childs == null) {
+				_childs = TechFlowNode.allOf(this);
+			}
+			return _childs;
 		}
 
 		@Override
@@ -197,6 +207,78 @@ class TreeModel implements ITreeContentProvider {
 			if (Strings.nullOrEmpty(v))
 				return u;
 			return v + " [" + u + "]";
+		}
+
+		@Override
+		public double activityValue() {
+			return tree.result.activityValueOf(descriptor);
+		}
+
+		@Override
+		public SocialRiskValue riskValue() {
+			return riskValue;
+		}
+	}
+
+	static class TechFlowNode implements Node {
+
+		private final IndicatorNode parent;
+		private final TechFlow techFlow;
+		private SocialRiskValue _riskValue;
+
+		TechFlowNode(IndicatorNode parent, TechFlow techFlow) {
+			this.parent = parent;
+			this.techFlow = techFlow;
+		}
+
+		static List<TechFlowNode> allOf(IndicatorNode parent) {
+			if (parent == null)
+				return List.of();
+			var av = parent.activityValue();
+			if (av == 0)
+				return List.of();
+
+			var nodes = new ArrayList<TechFlowNode>();
+			for (var techFlow : parent.tree.result.techIndex()) {
+				var node = new TechFlowNode(parent, techFlow);
+				// TODO: read the min-share from the tree config
+				var share = Math.abs(node.activityValue() / av);
+				if (share >= 0.0001) {
+					nodes.add(node);
+				}
+			}
+			return nodes;
+		}
+
+		private SocialResult result() {
+			return parent.tree.result;
+		}
+
+		@Override
+		public String name() {
+			return Labels.name(techFlow);
+		}
+
+		@Override
+		public Image icon() {
+			return Images.get(techFlow);
+		}
+
+		@Override
+		public SocialRiskValue riskValue() {
+			if (_riskValue != null)
+				return _riskValue;
+			_riskValue = new SocialRiskValue();
+			var level = result().riskLevelOf(parent.descriptor, techFlow);
+			if (level != null) {
+				_riskValue.put(level, activityValue());
+			}
+			return _riskValue;
+		}
+
+		@Override
+		public double activityValue() {
+			return result().activityValueOf(parent.descriptor, techFlow);
 		}
 	}
 }

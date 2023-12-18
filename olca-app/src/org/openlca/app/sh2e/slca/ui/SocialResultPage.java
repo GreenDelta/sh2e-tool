@@ -10,6 +10,7 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.results.ResultEditor;
 import org.openlca.app.sh2e.slca.SocialResult;
+import org.openlca.app.sh2e.slca.ui.TreeModel.CategoryNode;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.Numbers;
@@ -100,12 +101,9 @@ public class SocialResultPage extends FormPage {
 			return switch (col) {
 				case 0 -> n.name();
 				case 1 -> n.activityVariable();
-				case 2 -> {
-					var av = n.activityValue();
-					yield av != null
-							? Numbers.format(av)
-							: null;
-				}
+				case 2 -> n instanceof CategoryNode
+						? null
+						: Numbers.format(n.activityValue());
 				default -> {
 					var level = TreeGrid.levelOf(col);
 					if (level == null)

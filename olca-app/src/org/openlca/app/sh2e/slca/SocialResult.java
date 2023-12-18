@@ -3,7 +3,10 @@ package org.openlca.app.sh2e.slca;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.SocialIndicatorDao;
 import org.openlca.core.matrix.format.MatrixReader;
+import org.openlca.core.matrix.index.TechFlow;
+import org.openlca.core.matrix.index.TechIndex;
 import org.openlca.core.matrix.solvers.MatrixSolver;
+import org.openlca.core.model.RiskLevel;
 import org.openlca.core.model.descriptors.SocialIndicatorDescriptor;
 import org.openlca.core.results.providers.ResultProvider;
 
@@ -82,6 +85,10 @@ public class SocialResult {
 		return Optional.of(r);
 	}
 
+	public TechIndex techIndex() {
+		return data.techIndex();
+	}
+
 	public Set<SocialIndicatorDescriptor> indicators() {
 		return data.socialIndex().content();
 	}
@@ -102,5 +109,21 @@ public class SocialResult {
 		return i >= 0
 				? totalActivityValues[i]
 				: 0;
+	}
+
+	public double activityValueOf(SocialIndicatorDescriptor d, TechFlow techFlow) {
+		if (d == null || techFlow == null)
+			return 0;
+		int i = data.socialIndex().of(d);
+		int j = data.techIndex().of(techFlow);
+		return i >= 0 && j >= 0
+				? directActivityValues.get(i, j)
+				: 0;
+	}
+
+	public RiskLevel riskLevelOf(SocialIndicatorDescriptor d, TechFlow techFlow) {
+		return d != null || techFlow != null
+				? data.levelData().get(d, techFlow)
+				: null;
 	}
 }
