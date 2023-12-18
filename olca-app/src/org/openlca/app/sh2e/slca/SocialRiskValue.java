@@ -26,17 +26,17 @@ public class SocialRiskValue {
 	public double getShare(RiskLevel level) {
 		if (level == null)
 			return 0;
-		double max = max();
-		return max != 0
-				? Math.abs(get(level)) / max
+		double s = sum();
+		return s != 0
+				? Math.abs(get(level) / s)
 				: 0;
 	}
 
-	private double max() {
-		double m = Math.abs(values[0]);
-		for (int i = 1; i < values.length; i++) {
-			m = Math.max(m, Math.abs(values[i]));
+	private double sum() {
+		double s = 0;
+		for (double d : values) {
+			s += d;
 		}
-		return m;
+		return s;
 	}
 }

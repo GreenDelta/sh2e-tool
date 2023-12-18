@@ -41,30 +41,24 @@ class TreeModel implements ITreeContentProvider {
 	public Object[] getElements(Object obj) {
 		if (!(obj instanceof TreeModel))
 			return new Object[0];
-		var roots = new CategoryDao(db)
-				.getRootCategories(ModelType.SOCIAL_INDICATOR);
-		return childsOf(null, roots);
+		var cxs = new CategoryDao(db)
+				.getRootCategories(ModelType.SOCIAL_INDICATOR)
+				.stream()
+				.filter(this::hasChildren)
+				.map(cx -> new CategoryNode(this, cx));
+		var indicators = categoryIndex.get(null);
+		if (indicators == null || indicators.isEmpty())
+			return cxs.toArray();
+		var ixs = indicators.stream()
+				.map(i -> IndicatorNode.of(this, i));
+		return Stream.concat(cxs, ixs).toArray();
 	}
 
 	@Override
 	public Object[] getChildren(Object obj) {
 		return obj instanceof CategoryNode cn
-				? childsOf(cn.category.id, cn.category.childCategories)
+				? cn.childs().toArray(new Node[0])
 				: new Object[0];
-	}
-
-	private Object[] childsOf(Long root, List<Category> categories) {
-		var cxs = categories.stream()
-				.filter(this::hasChildren)
-				.map(CategoryNode::new)
-				.sorted();
-		var indicators = categoryIndex.get(root);
-		if (indicators == null || indicators.isEmpty())
-			return cxs.toArray();
-		var ixs = indicators.stream()
-				.map(i -> IndicatorNode.of(db, result, i))
-				.sorted();
-		return Stream.concat(cxs, ixs).toArray();
 	}
 
 	@Override
@@ -91,7 +85,7 @@ class TreeModel implements ITreeContentProvider {
 		return false;
 	}
 
-	interface Node extends Comparable<Node> {
+	interface Node {
 
 		String name();
 
@@ -105,16 +99,18 @@ class TreeModel implements ITreeContentProvider {
 			// TODO: new default!
 			return new SocialRiskValue();
 		}
-
-		@Override
-		default int compareTo(Node other) {
-			return other != null
-					? Strings.compare(this.name(), other.name())
-					: 1;
-		}
 	}
 
-	private record CategoryNode(Category category) implements Node {
+	static class CategoryNode implements Node {
+
+		private final TreeModel tree;
+		private final Category category;
+		private List<Node> _childs;
+
+		CategoryNode(TreeModel tree, Category category) {
+			this.tree = tree;
+			this.category = category;
+		}
 
 		@Override
 		public String name() {
@@ -125,19 +121,38 @@ class TreeModel implements ITreeContentProvider {
 		public Image icon() {
 			return Images.get(category);
 		}
+
+		List<Node> childs() {
+			if (_childs != null)
+				return _childs;
+			_childs = new ArrayList<>();
+			for (var c : category.childCategories) {
+				if (!tree.hasChildren(c))
+					continue;
+				var n = new CategoryNode(tree, c);
+				_childs.add(n);
+			}
+			var indicators = tree.categoryIndex.get(category.id);
+			if (indicators == null)
+				return _childs;
+			for (var i : indicators) {
+				_childs.add(IndicatorNode.of(tree, i));
+			}
+			return _childs;
+		}
 	}
 
-	private record IndicatorNode(
+	record IndicatorNode(
 			SocialIndicatorDescriptor descriptor,
 			SocialIndicator indicator,
 			SocialRiskValue value
 	) implements Node {
 
 		static IndicatorNode of(
-				IDatabase db, SocialRiskResult r, SocialIndicatorDescriptor d
+				TreeModel tree, SocialIndicatorDescriptor d
 		) {
-			var value = r.totalResultsOf(d);
-			var indicator = db.get(SocialIndicator.class, d.id);
+			var value = tree.result.totalResultsOf(d);
+			var indicator = tree.db.get(SocialIndicator.class, d.id);
 			return new IndicatorNode(d, indicator, value);
 		}
 

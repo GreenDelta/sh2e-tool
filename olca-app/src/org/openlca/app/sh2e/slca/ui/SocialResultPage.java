@@ -12,10 +12,13 @@ import org.openlca.app.results.ResultEditor;
 import org.openlca.app.sh2e.slca.SocialRiskResult;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
 import org.openlca.app.util.Labels;
-import org.openlca.app.util.Numbers;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.trees.Trees;
 import org.openlca.core.model.RiskLevel;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class SocialResultPage extends FormPage {
 
@@ -68,6 +71,7 @@ public class SocialResultPage extends FormPage {
 		}
 
 		tree.setLabelProvider(new TreeLabel());
+		tree.setComparator(new TreeSorter());
 		var model = new TreeModel(result);
 		tree.setContentProvider(model);
 		tree.setInput(model);
@@ -75,6 +79,9 @@ public class SocialResultPage extends FormPage {
 
 	private static class TreeLabel extends BaseLabelProvider
 			implements ITableLabelProvider, ITableColorProvider {
+
+		private final DecimalFormat percentage = new DecimalFormat(
+				"#0%", new DecimalFormatSymbols(Locale.US));
 
 		@Override
 		public Image getColumnImage(Object obj, int col) {
@@ -94,8 +101,8 @@ public class SocialResultPage extends FormPage {
 					var level = TreeGrid.levelOf(col);
 					if (level == null)
 						yield null;
-					var value = n.value().get(level);
-					yield Numbers.format(value, 2);
+					var value = n.value().getShare(level);
+					yield percentage.format(value);
 				}
 			};
 		}
@@ -113,7 +120,7 @@ public class SocialResultPage extends FormPage {
 			if (level == null)
 				return null;
 			var share = n.value().getShare(level);
-			return share >= 0.75
+			return share >= 0.50
 					? TreeGrid.colorOf(level)
 					: null;
 		}
