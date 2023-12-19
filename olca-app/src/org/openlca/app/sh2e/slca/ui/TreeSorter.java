@@ -29,7 +29,7 @@ public class TreeSorter extends ViewerComparator {
 			return cat1 - cat2;
 		}
 		if (e1 instanceof TechFlowNode t1 && e2 instanceof TechFlowNode t2)
-			return Double.compare(t2.activityValue(), t1.activityValue());
+			return Double.compare(t2.activity(), t1.activity());
 		if (e1 instanceof Node n1 && e2 instanceof Node n2)
 			return Strings.compare(n1.name(), n2.name());
 		return super.compare(viewer, e1, e2);

@@ -95,12 +95,8 @@ class TreeModel implements ITreeContentProvider {
 
 		Image icon();
 
-		default String activityVariable() {
+		default String activityValue() {
 			return null;
-		}
-
-		default double activityValue() {
-			return 0;
 		}
 
 		SocialRiskValue riskValue();
@@ -182,6 +178,10 @@ class TreeModel implements ITreeContentProvider {
 			this.riskValue = tree.result.riskValueOf(d);
 		}
 
+		public SocialIndicatorDescriptor descriptor() {
+			return descriptor;
+		}
+
 		@Override
 		public String name() {
 			return Labels.name(indicator);
@@ -200,7 +200,15 @@ class TreeModel implements ITreeContentProvider {
 		}
 
 		@Override
-		public String activityVariable() {
+		public String activityValue() {
+			var u = activityVariable();
+			var v = tree.result.activityValueOf(descriptor);
+			return u != null
+					? Numbers.format(v) + " " + u
+					: Numbers.format(v);
+		}
+
+		private String activityVariable() {
 			if (indicator == null)
 				return null;
 			var u = indicator.activityUnit != null
@@ -212,11 +220,6 @@ class TreeModel implements ITreeContentProvider {
 			if (Strings.nullOrEmpty(v))
 				return u;
 			return v + " [" + u + "]";
-		}
-
-		@Override
-		public double activityValue() {
-			return tree.result.activityValueOf(descriptor);
 		}
 
 		@Override
@@ -249,7 +252,7 @@ class TreeModel implements ITreeContentProvider {
 		static List<TechFlowNode> allOf(IndicatorNode parent) {
 			if (parent == null)
 				return List.of();
-			var pav = Math.abs(parent.activityValue());
+			var pav = Math.abs(parent.tree.result.activityValueOf(parent.descriptor));
 			if (pav == 0)
 				return List.of();
 
@@ -257,7 +260,7 @@ class TreeModel implements ITreeContentProvider {
 			var nodes = new ArrayList<TechFlowNode>();
 			for (var techFlow : parent.tree.result.techIndex()) {
 				var node = new TechFlowNode(parent, techFlow);
-				var av = Math.abs(node.activityValue());
+				var av = Math.abs(node.activity());
 				maxAv = Math.max(av, maxAv);
 				// TODO: read the min-share from the tree config
 				var share = av / pav;
@@ -268,10 +271,14 @@ class TreeModel implements ITreeContentProvider {
 
 			if (maxAv > 0) {
 				for (var n : nodes) {
-					n.activityShare = Math.abs(n.activityValue()) / maxAv;
+					n.activityShare = Math.abs(n.activity()) / maxAv;
 				}
 			}
 			return nodes;
+		}
+
+		public TechFlow techFlow() {
+			return techFlow;
 		}
 
 		public double activityShare() {
@@ -299,28 +306,24 @@ class TreeModel implements ITreeContentProvider {
 			_riskValue = new SocialRiskValue();
 			var level = result().riskLevelOf(parent.descriptor, techFlow);
 			if (level != null) {
-				_riskValue.put(level, activityValue());
+				_riskValue.put(level, activity());
 			}
 			return _riskValue;
 		}
 
-		@Override
-		public String activityVariable() {
-			return parent.activityVariable();
+		double activity() {
+			return result().activityValueOf(parent.descriptor, techFlow);
 		}
 
 		@Override
-		public double activityValue() {
-			return result().activityValueOf(parent.descriptor, techFlow);
+		public String activityValue() {
+			return Numbers.format(activity());
 		}
 
 		@Override
 		public String rawValue() {
 			var r = result().rawValueOf(parent.descriptor, techFlow);
-			var u = parent.indicator.unitOfMeasurement;
-			return u != null
-					? Numbers.format(r) + " [" + u + "]"
-					: Numbers.format(r);
+			return Numbers.format(r);
 		}
 	}
 }

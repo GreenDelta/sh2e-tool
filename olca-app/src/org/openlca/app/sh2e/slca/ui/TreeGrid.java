@@ -88,7 +88,7 @@ class TreeGrid {
 					LOW_RISK,
 					MEDIUM_RISK,
 					HIGH_RISK,
-					VERY_HIGH_RISK -> new RGB(233, 30, 99);
+					VERY_HIGH_RISK -> new RGB(240, 98, 146);
 			default -> new RGB(96, 125, 139);
 		};
 		return Colors.get(rgb);

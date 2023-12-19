@@ -7,17 +7,19 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
+import org.openlca.app.App;
 import org.openlca.app.components.ContributionImage;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.results.ResultEditor;
 import org.openlca.app.sh2e.slca.SocialResult;
-import org.openlca.app.sh2e.slca.ui.TreeModel.CategoryNode;
+import org.openlca.app.sh2e.slca.ui.TreeModel.IndicatorNode;
 import org.openlca.app.sh2e.slca.ui.TreeModel.Node;
 import org.openlca.app.sh2e.slca.ui.TreeModel.TechFlowNode;
+import org.openlca.app.util.Actions;
 import org.openlca.app.util.Colors;
 import org.openlca.app.util.Labels;
-import org.openlca.app.util.Numbers;
 import org.openlca.app.util.UI;
+import org.openlca.app.viewers.Viewers;
 import org.openlca.app.viewers.trees.Trees;
 import org.openlca.core.model.RiskLevel;
 
@@ -47,6 +49,7 @@ public class SocialResultPage extends FormPage {
 		var comp = UI.sectionClient(section, tk, 1);
 		UI.gridData(section, true, true);
 
+		// create headers and tree
 		var levels = RiskLevel.values();
 		var headers = new String[3 + levels.length];
 		headers[0] = "";
@@ -60,6 +63,7 @@ public class SocialResultPage extends FormPage {
 		}
 		var tree = Trees.createViewer(comp, headers);
 
+		// bind column widths
 		double[] widths = new double[headers.length];
 		widths[0] = 0.2;
 		widths[1] = 0.15;
@@ -69,6 +73,7 @@ public class SocialResultPage extends FormPage {
 		}
 		Trees.bindColumnWidths(tree.getTree(), widths);
 
+		// set column tool tips
 		for (var level : levels) {
 			int col = TreeGrid.columnOf(level);
 			var t = tree.getTree();
@@ -77,10 +82,27 @@ public class SocialResultPage extends FormPage {
 			t.getColumn(col).setToolTipText(Labels.of(level));
 		}
 
+		// set providers
 		tree.setLabelProvider(new TreeLabel());
 		tree.setComparator(new TreeSorter());
 		var model = new TreeModel(result);
 		tree.setContentProvider(model);
+
+		// bind actions
+		var onOpen = Actions.onOpen(() -> {
+			var obj = Viewers.getFirstSelected(tree);
+			if (obj == null)
+				return;
+			if (obj instanceof TechFlowNode t) {
+				App.open(t.techFlow().provider());
+				return;
+			}
+			if (obj instanceof IndicatorNode i) {
+				App.open(i.descriptor());
+			}
+		});
+		Actions.bind(tree, onOpen);
+
 		tree.setInput(model);
 	}
 
@@ -117,14 +139,7 @@ public class SocialResultPage extends FormPage {
 				return null;
 			return switch (col) {
 				case 0 -> n.name();
-				case 1 -> {
-					if (n instanceof CategoryNode)
-						yield null;
-					var a = n.activityVariable();
-					yield a != null
-							? Numbers.format(n.activityValue()) + " " + a
-							: null;
-				}
+				case 1 -> n.activityValue();
 				case 2 -> n.rawValue();
 				default -> {
 					var level = TreeGrid.levelOf(col);
