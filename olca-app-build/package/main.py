@@ -22,6 +22,8 @@ def package(
     if osa.is_mac():
         MacDir.arrange(build_dir)
 
+    build_dir.unjar_plugins()
+
     # JRE and native libraries
     JRE.extract_to(build_dir)
     lib = Lib.MKL if mkl else Lib.BLAS
@@ -111,25 +113,18 @@ def main():
             if build_dir.root.exists():
                 print(f"delete: ${build_dir.root}")
                 shutil.rmtree(build_dir.root)
-            if build_dir.export_dir.exists():
-                print(f"delete: ${build_dir.export_dir}")
-                shutil.rmtree(build_dir.export_dir)
         return
 
     version = Version.get()
     for osa in OsArch:
         build_dir = BuildDir(osa)
 
-        if not build_dir.export_dir.exists():
+        if not build_dir.root.exists():
             print(f"No {osa} export is available; skipped")
             continue
 
-        print(f"\nCopying the {osa.value} export...")
-        build_dir.copy_export()
-
         print(f"Packaging the {osa.value} build...")
         package(osa, version, build_dir, args.winstaller, args.mkl)
-        delete(build_dir.root)
         print(f"Done packaging the {osa.value} build.")
 
 
