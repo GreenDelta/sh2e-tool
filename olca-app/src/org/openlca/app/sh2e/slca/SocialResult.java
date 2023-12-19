@@ -11,7 +11,6 @@ import org.openlca.core.model.descriptors.SocialIndicatorDescriptor;
 import org.openlca.core.results.providers.ResultProvider;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class SocialResult {
 
@@ -20,19 +19,22 @@ public class SocialResult {
 	private final double[] totalActivityValues;
 	private final double[] totalRiskActivityValues;
 	private final MatrixReader directActivityValues;
+	private final double[] weightedRawValues;
 
 	private SocialResult(
 			SocialMatrixData data,
 			SocialRiskIndex riskIndex,
 			double[] totalActivityValues,
 			double[] totalRiskActivityValues,
-			MatrixReader directActivityValues) {
+			MatrixReader directActivityValues,
+			double[] weightedRawValues
+	) {
 		this.data = data;
 		this.riskIndex = riskIndex;
 		this.totalActivityValues = totalActivityValues;
 		this.totalRiskActivityValues = totalRiskActivityValues;
 		this.directActivityValues = directActivityValues;
-
+		this.weightedRawValues = weightedRawValues;
 	}
 
 	public static Optional<SocialResult> calculate(
@@ -75,12 +77,28 @@ public class SocialResult {
 			totalRiskActivityValues[k] += v;
 		});
 
+		// calculate the weighted raw data
+		var weightedRawValues = new double[socialIndex.size()];
+		data.rawData().iterate((i, j, r) -> {
+			double av = directActivityValues.get(i, j);
+			weightedRawValues[i] += (r * av);
+		});
+		for (int i = 0; i < weightedRawValues.length; i++) {
+			double tav = totalActivityValues[i];
+			if (tav == 0) {
+				weightedRawValues[i] = 0;
+			} else {
+				weightedRawValues[i] /= tav;
+			}
+		}
+
 		var r = new SocialResult(
 				data,
 				riskIndex,
 				totalActivityValues,
 				totalRiskActivityValues,
-				directActivityValues
+				directActivityValues,
+				weightedRawValues
 		);
 		return Optional.of(r);
 	}
@@ -89,8 +107,8 @@ public class SocialResult {
 		return data.techIndex();
 	}
 
-	public Set<SocialIndicatorDescriptor> indicators() {
-		return data.socialIndex().content();
+	public SocialIndex socialIndex() {
+		return data.socialIndex();
 	}
 
 	public SocialRiskValue riskValueOf(SocialIndicatorDescriptor d) {
@@ -114,8 +132,8 @@ public class SocialResult {
 	public double activityValueOf(SocialIndicatorDescriptor d, TechFlow techFlow) {
 		if (d == null || techFlow == null)
 			return 0;
-		int i = data.socialIndex().of(d);
-		int j = data.techIndex().of(techFlow);
+		int i = socialIndex().of(d);
+		int j = techIndex().of(techFlow);
 		return i >= 0 && j >= 0
 				? directActivityValues.get(i, j)
 				: 0;
@@ -126,4 +144,24 @@ public class SocialResult {
 				? data.levelData().get(d, techFlow)
 				: null;
 	}
+
+	public double rawValueOf(SocialIndicatorDescriptor d, TechFlow techFlow) {
+		if (d == null || techFlow == null)
+			return 0;
+		int i = socialIndex().of(d);
+		int j = techIndex().of(techFlow);
+		return i >= 0 && j >= 0
+				? data.rawData().get(i, j)
+				: 0;
+	}
+
+	public double rawValueOf(SocialIndicatorDescriptor d) {
+		if (d == null)
+			return 0;
+		int i = socialIndex().of(d);
+		return i >= 0
+				? weightedRawValues[i]
+				: 0;
+	}
+
 }

@@ -7,6 +7,7 @@ import org.openlca.app.rcp.images.Images;
 import org.openlca.app.sh2e.slca.SocialResult;
 import org.openlca.app.sh2e.slca.SocialRiskValue;
 import org.openlca.app.util.Labels;
+import org.openlca.app.util.Numbers;
 import org.openlca.core.database.CategoryDao;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.matrix.index.TechFlow;
@@ -32,7 +33,7 @@ class TreeModel implements ITreeContentProvider {
 		this.result = result;
 		this.db = Database.get();
 		categoryIndex = new HashMap<>();
-		for (var i : result.indicators()) {
+		for (var i : result.socialIndex()) {
 			categoryIndex.computeIfAbsent(
 					i.category, $ -> new ArrayList<>()).add(i);
 		}
@@ -103,6 +104,10 @@ class TreeModel implements ITreeContentProvider {
 		}
 
 		SocialRiskValue riskValue();
+
+		default String rawValue() {
+			return null;
+		}
 	}
 
 	static class CategoryNode implements Node {
@@ -218,6 +223,15 @@ class TreeModel implements ITreeContentProvider {
 		public SocialRiskValue riskValue() {
 			return riskValue;
 		}
+
+		@Override
+		public String rawValue() {
+			var r = tree.result.rawValueOf(descriptor);
+			var u = indicator.unitOfMeasurement;
+			return u != null
+					? Numbers.format(r) + " [" + u + "]"
+					: Numbers.format(r);
+		}
 	}
 
 	static class TechFlowNode implements Node {
@@ -298,6 +312,15 @@ class TreeModel implements ITreeContentProvider {
 		@Override
 		public double activityValue() {
 			return result().activityValueOf(parent.descriptor, techFlow);
+		}
+
+		@Override
+		public String rawValue() {
+			var r = result().rawValueOf(parent.descriptor, techFlow);
+			var u = parent.indicator.unitOfMeasurement;
+			return u != null
+					? Numbers.format(r) + " [" + u + "]"
+					: Numbers.format(r);
 		}
 	}
 }

@@ -125,7 +125,7 @@ public class SocialResultPage extends FormPage {
 							? Numbers.format(n.activityValue()) + " " + a
 							: null;
 				}
-				case 2 -> null;
+				case 2 -> n.rawValue();
 				default -> {
 					var level = TreeGrid.levelOf(col);
 					if (level == null)
