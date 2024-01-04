@@ -28,12 +28,10 @@ import org.openlca.app.util.MsgBox;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.Viewers;
 import org.openlca.app.viewers.tables.Tables;
+import org.openlca.app.viewers.tables.modify.DoubleCellModifier;
+import org.openlca.app.viewers.tables.modify.ModifySupport;
 import org.openlca.core.database.IDatabase;
-import org.openlca.core.model.ImpactCategory;
 import org.openlca.core.model.ImpactMethod;
-import org.openlca.core.model.ModelType;
-import org.openlca.core.model.ParameterRedef;
-import org.openlca.core.model.Process;
 import org.openlca.core.model.ProductSystem;
 import org.openlca.core.model.descriptors.Descriptor;
 import org.openlca.util.Strings;
@@ -41,7 +39,6 @@ import org.openlca.util.Strings;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 public class ParameterAnalysisDialog extends FormDialog {
 
@@ -97,9 +94,13 @@ public class ParameterAnalysisDialog extends FormDialog {
 		paramTable = Tables.createViewer(
 				body, M.Parameter, M.Context, "Start value", "End value");
 		paramTable.setLabelProvider(new ParamLabel());
+		new ModifySupport<Param>(paramTable)
+				.bind("Start value", new ValueModifier(true))
+				.bind("End value", new ValueModifier(false));
 		Tables.bindColumnWidths(paramTable, 0.3, 0.3, 0.2, 0.2);
 		var onAdd = Actions.onAdd(this::addParams);
-		Actions.bind(paramTable, onAdd);
+		var onRemove = Actions.onRemove(this::removeParam);
+		Actions.bind(paramTable, onAdd, onRemove);
 		paramTable.setInput(params);
 	}
 
@@ -152,6 +153,13 @@ public class ParameterAnalysisDialog extends FormDialog {
 		}
 	}
 
+	private void removeParam() {
+		if (!(Viewers.getFirstSelected(paramTable) instanceof Param param))
+			return;
+		params.remove(param);
+		paramTable.setInput(params);
+	}
+
 	private static class ComboLabel extends BaseLabelProvider
 			implements ITableLabelProvider {
 
@@ -200,38 +208,74 @@ public class ParameterAnalysisDialog extends FormDialog {
 		}
 	}
 
-	record Param(
-			ParameterRedef redef,
-			Descriptor context,
-			double start,
-			double end) {
+	@Override
+	protected void okPressed() {
 
-		static Param of(ParameterRedef redef, IDatabase db) {
-			Descriptor context = null;
-			if (redef.contextId != null) {
-				context = redef.contextType == ModelType.IMPACT_CATEGORY
-						? db.getDescriptor(ImpactCategory.class, redef.contextId)
-						: db.getDescriptor(Process.class, redef.contextId);
-			}
-			return new Param(redef, context, redef.value, redef.value);
+		int count = iterationSpinner.getSelection();
+		if (count < 2) {
+			MsgBox.info("At least 2 iterations are required",
+					"For the analysis, you need to run at least 2 iterations");
+			return;
 		}
 
-		boolean hasRedef(ParameterRedef r) {
-			if (redef == null || r == null)
-				return false;
-			return Strings.nullOrEqual(redef.name, r.name)
-					&& Objects.equals(redef.contextId, r.contextId);
+		if (params.isEmpty()) {
+			MsgBox.info("No parameters selected",
+					"You have to add at least one parameter to the analysis setup.");
+			return;
+		}
+
+		var system = Viewers.getFirstSelected(systemCombo) instanceof Descriptor d
+				? db.get(ProductSystem.class, d.id)
+				: null;
+		if (system == null) {
+			MsgBox.info("No product system selected",
+					"A product system is required to run a parameter analysis");
+			return;
+		}
+
+		var method = Viewers.getFirstSelected(methodCombo) instanceof Descriptor m
+				? db.get(ImpactMethod.class, m.id)
+				: null;
+		if (method == null) {
+			MsgBox.info("No impact assessment method selected",
+					"An impact assessment method is required to run a parameter analysis");
+			return;
+		}
+		if (method.impactCategories.isEmpty()) {
+			MsgBox.info("No impact categories in method",
+					"The selected impact assessment method does not have any impact categories");
+			return;
+		}
+
+
+	}
+
+
+	private static class ValueModifier extends DoubleCellModifier<Param> {
+
+		private final boolean forStart;
+
+		ValueModifier(boolean forStart) {
+			this.forStart = forStart;
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (o == null)
-				return false;
-			if (o == this)
-				return true;
-			if (!(o instanceof Param other))
-				return false;
-			return this.hasRedef(other.redef);
+		public Double getDouble(Param param) {
+			if (param == null)
+				return null;
+			return forStart ? param.start : param.end;
+		}
+
+		@Override
+		public void setDouble(Param param, Double val) {
+			if (param == null)
+				return;
+			double v = val == null ? 0 : val;
+			if (forStart) {
+				param.start = v;
+			} else {
+				param.end = v;
+			}
 		}
 	}
 }
