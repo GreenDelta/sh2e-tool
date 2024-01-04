@@ -39,6 +39,7 @@ import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.rcp.images.Images;
 import org.openlca.app.sh2e.Sh2eToolBar;
 import org.openlca.app.sh2e.StartPage;
+import org.openlca.app.sh2e.params.ParameterAnalysisDialog;
 import org.openlca.app.tools.libraries.LibraryExportDialog;
 import org.openlca.app.tools.mapping.MappingTool;
 import org.openlca.app.tools.openepd.EpdPanel;
@@ -149,6 +150,9 @@ public class RcpActionBarAdvisor extends ActionBarAdvisor {
 		menu.add(new Separator());
 
 		createDeveloperMenu(menu);
+
+		menu.add(Actions.create(
+				"Parameter analysis", ParameterAnalysisDialog::show));
 
 		// bulk replace
 		var brMenu = new MenuManager(M.Bulkreplace);
