@@ -1,5 +1,6 @@
 package org.openlca.app.sh2e.params;
 
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -23,6 +24,7 @@ import org.openlca.app.db.Database;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.rcp.images.Images;
 import org.openlca.app.util.Actions;
+import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.MsgBox;
 import org.openlca.app.util.UI;
@@ -31,6 +33,8 @@ import org.openlca.app.viewers.tables.Tables;
 import org.openlca.app.viewers.tables.modify.DoubleCellModifier;
 import org.openlca.app.viewers.tables.modify.ModifySupport;
 import org.openlca.core.database.IDatabase;
+import org.openlca.core.math.SystemCalculator;
+import org.openlca.core.model.CalculationSetup;
 import org.openlca.core.model.ImpactMethod;
 import org.openlca.core.model.ProductSystem;
 import org.openlca.core.model.descriptors.Descriptor;
@@ -247,9 +251,28 @@ public class ParameterAnalysisDialog extends FormDialog {
 			return;
 		}
 
+		try {
+			new ProgressMonitorDialog(UI.shell()).run(true, true, monitor -> {
+				monitor.beginTask("Run parameter analysis", count);
+				var seq = ParamSeq.of(params, count);
+				for (int i = 0; i < count; i++) {
+					if (monitor.isCanceled())
+						break;
+					monitor.subTask("Run iteration " + (i + 1) + " of " + count);
+					var setup = CalculationSetup.of(system)
+							.withImpactMethod(method)
+							.withParameters(seq.get(i));
+					new SystemCalculator(db).calculateLazy(setup);
+					monitor.worked(1);
+				}
+				monitor.done();
+			});
+		} catch (Exception e) {
+			ErrorReporter.on("Failed to run parameter analysis", e);
+		}
 
+		super.okPressed();
 	}
-
 
 	private static class ValueModifier extends DoubleCellModifier<Param> {
 
