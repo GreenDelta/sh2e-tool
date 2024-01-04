@@ -36,4 +36,8 @@ class ParamSeq {
 				: List.of();
 	}
 
+	int count() {
+		return seqs.size();
+	}
+
 }

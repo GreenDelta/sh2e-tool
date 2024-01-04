@@ -29,11 +29,13 @@ import org.openlca.app.util.Labels;
 import org.openlca.app.util.MsgBox;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.Viewers;
+import org.openlca.app.viewers.combo.AllocationCombo;
 import org.openlca.app.viewers.tables.Tables;
 import org.openlca.app.viewers.tables.modify.DoubleCellModifier;
 import org.openlca.app.viewers.tables.modify.ModifySupport;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.math.SystemCalculator;
+import org.openlca.core.model.AllocationMethod;
 import org.openlca.core.model.CalculationSetup;
 import org.openlca.core.model.ImpactMethod;
 import org.openlca.core.model.ProductSystem;
@@ -41,6 +43,7 @@ import org.openlca.core.model.descriptors.Descriptor;
 import org.openlca.util.Strings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -50,6 +53,7 @@ public class ParameterAnalysisDialog extends FormDialog {
 	private final List<Param> params = new ArrayList<>();
 	private TableComboViewer systemCombo;
 	private TableComboViewer methodCombo;
+	private AllocationCombo allocationCombo;
 	private Spinner iterationSpinner;
 	private TableViewer paramTable;
 
@@ -90,6 +94,11 @@ public class ParameterAnalysisDialog extends FormDialog {
 
 		UI.label(top, tk, M.ImpactAssessmentMethod);
 		methodCombo = createCombo(top, tk, db.getDescriptors(ImpactMethod.class));
+
+		UI.label(top, tk, M.AllocationMethod);
+		allocationCombo = new AllocationCombo(top, AllocationMethod.values());
+		allocationCombo.setNullable(false);
+		allocationCombo.select(AllocationMethod.USE_DEFAULT);
 
 		UI.label(top, tk, M.NumberOfIterations);
 		iterationSpinner = UI.spinner(top, tk, SWT.BORDER);
@@ -251,27 +260,33 @@ public class ParameterAnalysisDialog extends FormDialog {
 			return;
 		}
 
+		var allocation = allocationCombo.getSelected();
+		super.okPressed();
+
 		try {
 			new ProgressMonitorDialog(UI.shell()).run(true, true, monitor -> {
 				monitor.beginTask("Run parameter analysis", count);
 				var seq = ParamSeq.of(params, count);
+				var result = new ParamResult(
+						system, method, allocation, seq, new HashMap<>());
 				for (int i = 0; i < count; i++) {
 					if (monitor.isCanceled())
 						break;
 					monitor.subTask("Run iteration " + (i + 1) + " of " + count);
 					var setup = CalculationSetup.of(system)
 							.withImpactMethod(method)
+							.withAllocation(allocation)
 							.withParameters(seq.get(i));
-					new SystemCalculator(db).calculateLazy(setup);
+					var r = new SystemCalculator(db).calculateLazy(setup);
+					result.append(r);
 					monitor.worked(1);
 				}
+				ParameterAnalysisResultPage.open(result);
 				monitor.done();
 			});
 		} catch (Exception e) {
 			ErrorReporter.on("Failed to run parameter analysis", e);
 		}
-
-		super.okPressed();
 	}
 
 	private static class ValueModifier extends DoubleCellModifier<Param> {
