@@ -16,6 +16,7 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openlca.app.App;
 import org.openlca.app.M;
+import org.openlca.app.components.FileChooser;
 import org.openlca.app.db.Cache;
 import org.openlca.app.editors.Editors;
 import org.openlca.app.editors.SimpleEditorInput;
@@ -24,7 +25,10 @@ import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.rcp.images.Images;
 import org.openlca.app.util.Colors;
 import org.openlca.app.util.Controls;
+import org.openlca.app.util.ErrorReporter;
+import org.openlca.app.util.FileType;
 import org.openlca.app.util.Labels;
+import org.openlca.app.util.Popup;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.Viewers;
 import org.openlca.core.model.RootEntity;
@@ -90,6 +94,23 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			allocation.setEditable(false);
 			var iterations = UI.labeledText(comp, tk, "Number of iterations");
 			iterations.setText(Integer.toString(result.count()));
+
+			UI.filler(comp, tk);
+			var excelBtn = UI.button(comp, tk, M.ExportToExcel);
+			excelBtn.setImage(Images.get(FileType.EXCEL));
+			Controls.onSelect(excelBtn, $ -> {
+				var file = FileChooser.forSavingFile("Export results", "parameter analysis.xlsx");
+				if (file == null)
+					return;
+				var export = new ParamResultExport(result, file);
+				App.runWithProgress("Export results", export, () -> {
+					if (export.error() != null) {
+						ErrorReporter.on("Export failed", export.error());
+					} else {
+						Popup.info("Export done", "Wrote file " + file.getName());
+					}
+				});
+			});
 		}
 
 		private void link(

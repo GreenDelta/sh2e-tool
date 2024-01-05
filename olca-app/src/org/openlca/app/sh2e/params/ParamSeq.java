@@ -7,10 +7,12 @@ import java.util.List;
 
 class ParamSeq {
 
-	private List<List<ParameterRedef>> seqs;
+	private final List<Param> params;
+	private final List<List<ParameterRedef>> seqs;
 
-	private ParamSeq(List<List<ParameterRedef>> seqs) {
+	private ParamSeq(List<Param> params, List<List<ParameterRedef>> seqs) {
 		this.seqs = seqs;
+		this.params = params;
 	}
 
 	static ParamSeq of(List<Param> params, int count) {
@@ -27,13 +29,17 @@ class ParamSeq {
 				list.add(redef);
 			}
 		}
-		return new ParamSeq(seqs);
+		return new ParamSeq(params, seqs);
 	}
 
 	List<ParameterRedef> get(int i) {
 		return i >= 0 && i < seqs.size()
 				? seqs.get(i)
 				: List.of();
+	}
+
+	List<Param> params() {
+		return params;
 	}
 
 	int count() {
