@@ -19,8 +19,9 @@ import org.openlca.app.rcp.images.Images;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.UI;
+import org.openlca.app.viewers.Viewers;
 import org.openlca.core.model.RootEntity;
-import org.openlca.core.model.descriptors.RootDescriptor;
+import org.openlca.core.model.descriptors.ImpactDescriptor;
 
 public class ParameterAnalysisResultPage extends SimpleFormEditor {
 
@@ -60,7 +61,12 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			var form = UI.header(mForm, "Parameter analysis results");
 			var tk = mForm.getToolkit();
 			var body = UI.body(form, tk);
+			setupSection(body, tk);
+			chartSection(body, tk);
+			form.reflow(true);
+		}
 
+		private void setupSection(Composite body, FormToolkit tk) {
 			var comp = UI.formSection(body, tk, "Calculation setup");
 			link(comp, tk, M.ProductSystem, result.system());
 			link(comp, tk, M.ImpactAssessmentMethod, result.method());
@@ -69,24 +75,31 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			allocation.setEditable(false);
 			var iterations = UI.labeledText(comp, tk, "Number of iterations");
 			iterations.setText(Integer.toString(result.count()));
-
-			form.reflow(true);
 		}
 
 		private void link(
-				Composite comp, FormToolkit tk, String label, Object entity
+				Composite comp, FormToolkit tk, String label, RootEntity e
 		) {
 			UI.label(comp, tk, label);
 			var link = UI.imageHyperlink(comp, tk, SWT.TOP);
-			if (entity instanceof RootDescriptor d) {
-				link.setText(Labels.name(d));
-				link.setImage(Images.get(d));
-				Controls.onClick(link, e -> App.open(d));
-			} else if (entity instanceof RootEntity ce) {
-				link.setText(Labels.name(ce));
-				link.setImage(Images.get(ce));
-				Controls.onClick(link, e -> App.open(ce));
-			}
+			link.setText(Labels.name(e));
+			link.setImage(Images.get(e));
+			Controls.onClick(link, $ -> App.open(e));
+		}
+
+		private void chartSection(Composite body, FormToolkit tk) {
+			var comp = UI.formSection(body, tk, "Impact assessment results");
+			UI.gridLayout(comp, 1);
+			var top = tk.createComposite(comp);
+			UI.fillHorizontal(top);
+			UI.gridLayout(top, 2);
+			UI.label(top, tk, M.ImpactCategory);
+			var impacts = result.impacts();
+			var impactCombo = DescriptorCombo.of(top, tk, impacts);
+			impactCombo.addSelectionChangedListener(e -> {
+				ImpactDescriptor d = Viewers.getFirstSelected(impactCombo);
+				System.out.println(d.name);
+			});
 		}
 	}
 }

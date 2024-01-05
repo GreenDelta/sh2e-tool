@@ -31,4 +31,8 @@ record ParamResult(
 	int count() {
 		return seq().count();
 	}
+
+	List<ImpactDescriptor> impacts() {
+		return new ArrayList<>(results.keySet());
+	}
 }

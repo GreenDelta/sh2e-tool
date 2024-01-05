@@ -1,23 +1,17 @@
 package org.openlca.app.sh2e.params;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.nebula.jface.tablecomboviewer.TableComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.FormDialog;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openlca.app.M;
 import org.openlca.app.components.ParameterRedefDialog;
 import org.openlca.app.db.Database;
@@ -40,7 +34,6 @@ import org.openlca.core.model.CalculationSetup;
 import org.openlca.core.model.ImpactMethod;
 import org.openlca.core.model.ProductSystem;
 import org.openlca.core.model.descriptors.Descriptor;
-import org.openlca.util.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,10 +83,12 @@ public class ParameterAnalysisDialog extends FormDialog {
 		UI.gridLayout(top, 2);
 
 		UI.label(top, tk, M.ProductSystem);
-		systemCombo = createCombo(top, tk, db.getDescriptors(ProductSystem.class));
+		systemCombo = DescriptorCombo.of(
+			top, tk, db.getDescriptors(ProductSystem.class));
 
 		UI.label(top, tk, M.ImpactAssessmentMethod);
-		methodCombo = createCombo(top, tk, db.getDescriptors(ImpactMethod.class));
+		methodCombo = DescriptorCombo.of(
+			top, tk, db.getDescriptors(ImpactMethod.class));
 
 		UI.label(top, tk, M.AllocationMethod);
 		allocationCombo = new AllocationCombo(top, AllocationMethod.values());
@@ -115,31 +110,6 @@ public class ParameterAnalysisDialog extends FormDialog {
 		var onRemove = Actions.onRemove(this::removeParam);
 		Actions.bind(paramTable, onAdd, onRemove);
 		paramTable.setInput(params);
-	}
-
-	private TableComboViewer createCombo(
-			Composite comp, FormToolkit tk, List<? extends Descriptor> descriptors
-	) {
-		var combo = UI.tableCombo(comp, tk, SWT.BORDER | SWT.READ_ONLY);
-		UI.fillHorizontal(combo);
-		var viewer = new TableComboViewer(combo);
-		viewer.setLabelProvider(new ComboLabel());
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setComparator(new ViewerComparator() {
-			@Override
-			public int compare(Viewer viewer, Object o1, Object o2) {
-				if (!(o1 instanceof Descriptor d1) || !(o2 instanceof Descriptor d2))
-					return super.compare(viewer, o1, o2);
-				var n1 = Labels.name(d1);
-				var n2 = Labels.name(d2);
-				return Strings.compare(n1, n2);
-			}
-		});
-		viewer.setInput(descriptors);
-		if (!descriptors.isEmpty()) {
-			viewer.setSelection(new StructuredSelection(descriptors.get(0)));
-		}
-		return viewer;
 	}
 
 	private void addParams() {
@@ -173,53 +143,6 @@ public class ParameterAnalysisDialog extends FormDialog {
 		paramTable.setInput(params);
 	}
 
-	private static class ComboLabel extends BaseLabelProvider
-			implements ITableLabelProvider {
-
-		@Override
-		public Image getColumnImage(Object obj, int col) {
-			return col == 0 && obj instanceof Descriptor d
-					? Images.get(d)
-					: null;
-		}
-
-		@Override
-		public String getColumnText(Object obj, int col) {
-			return col == 0 && obj instanceof Descriptor d
-					? Labels.name(d)
-					: null;
-		}
-	}
-
-	private static class ParamLabel extends BaseLabelProvider
-			implements ITableLabelProvider {
-
-		@Override
-		public Image getColumnImage(Object obj, int col) {
-			if (!(obj instanceof Param param))
-				return null;
-			if (col == 0)
-				return Icon.FORMULA.get();
-			if (col == 1 && param.context != null)
-				return Images.get(param.context);
-			return null;
-		}
-
-		@Override
-		public String getColumnText(Object obj, int col) {
-			if (!(obj instanceof Param param))
-				return null;
-			return switch (col) {
-				case 0 -> param.redef.name;
-				case 1 -> param.context != null
-						? Labels.name(param.context)
-						: "global";
-				case 2 -> Double.toString(param.start);
-				case 3 -> Double.toString(param.end);
-				default -> null;
-			};
-		}
-	}
 
 	@Override
 	protected void okPressed() {
@@ -286,6 +209,36 @@ public class ParameterAnalysisDialog extends FormDialog {
 			});
 		} catch (Exception e) {
 			ErrorReporter.on("Failed to run parameter analysis", e);
+		}
+	}
+
+	private static class ParamLabel extends BaseLabelProvider
+			implements ITableLabelProvider {
+
+		@Override
+		public Image getColumnImage(Object obj, int col) {
+			if (!(obj instanceof Param param))
+				return null;
+			if (col == 0)
+				return Icon.FORMULA.get();
+			if (col == 1 && param.context != null)
+				return Images.get(param.context);
+			return null;
+		}
+
+		@Override
+		public String getColumnText(Object obj, int col) {
+			if (!(obj instanceof Param param))
+				return null;
+			return switch (col) {
+				case 0 -> param.redef.name;
+				case 1 -> param.context != null
+						? Labels.name(param.context)
+						: "global";
+				case 2 -> Double.toString(param.start);
+				case 3 -> Double.toString(param.end);
+				default -> null;
+			};
 		}
 	}
 
