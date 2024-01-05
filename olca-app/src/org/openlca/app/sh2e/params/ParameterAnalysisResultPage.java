@@ -1,7 +1,13 @@
 package org.openlca.app.sh2e.params;
 
+import org.eclipse.nebula.jface.tablecomboviewer.TableComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IBarSeries;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeries.SeriesType;
+import org.eclipse.swtchart.LineStyle;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -16,16 +22,25 @@ import org.openlca.app.editors.SimpleEditorInput;
 import org.openlca.app.editors.SimpleFormEditor;
 import org.openlca.app.rcp.images.Icon;
 import org.openlca.app.rcp.images.Images;
+import org.openlca.app.util.Colors;
 import org.openlca.app.util.Controls;
 import org.openlca.app.util.Labels;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.Viewers;
 import org.openlca.core.model.RootEntity;
 import org.openlca.core.model.descriptors.ImpactDescriptor;
+import org.openlca.util.Strings;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.Locale;
 
 public class ParameterAnalysisResultPage extends SimpleFormEditor {
 
 	private ParamResult result;
+	private TableComboViewer impactCombo;
+	private Chart chart;
 
 	static void open(ParamResult result) {
 		if (result == null)
@@ -95,11 +110,63 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			UI.gridLayout(top, 2);
 			UI.label(top, tk, M.ImpactCategory);
 			var impacts = result.impacts();
-			var impactCombo = DescriptorCombo.of(top, tk, impacts);
-			impactCombo.addSelectionChangedListener(e -> {
-				ImpactDescriptor d = Viewers.getFirstSelected(impactCombo);
-				System.out.println(d.name);
-			});
+			impactCombo = DescriptorCombo.of(top, tk, impacts);
+			impactCombo.addSelectionChangedListener(e -> setChartData());
+
+			chart = new Chart(comp, SWT.NONE);
+			UI.fillHorizontal(chart).heightHint = 400;
+			chart.setOrientation(SWT.HORIZONTAL);
+			chart.getLegend().setVisible(false);
+
+			// we set a white title just to fix the problem
+			// that the y-axis is cut sometimes
+			chart.getTitle().setText(".");
+			chart.getTitle().setFont(UI.defaultFont());
+			chart.getTitle().setForeground(Colors.background());
+
+			// configure the x-axis with one category
+			var x = chart.getAxisSet().getXAxis(0);
+			x.getTitle().setVisible(false);
+			x.getTick().setVisible(false);
+			x.getGrid().setVisible(false);
+
+			// configure the y-axis
+			var y = chart.getAxisSet().getYAxis(0);
+			y.getTitle().setFont(UI.defaultFont());
+			y.getTitle().setForeground(body.getForeground());
+			y.getTick().setForeground(body.getForeground());
+			y.getGrid().setStyle(LineStyle.NONE);
+			y.getTick().setFormat(new DecimalFormat("0.0E0#",
+					new DecimalFormatSymbols(Locale.US)));
+
+			tk.adapt(chart);
+			setChartData();
 		}
+	}
+
+	private void setChartData() {
+		// delete the old series
+		Arrays.stream(chart.getSeriesSet().getSeries())
+				.map(ISeries::getId)
+				.forEach(id -> chart.getSeriesSet().deleteSeries(id));
+
+		ImpactDescriptor d = Viewers.getFirstSelected(impactCombo);
+		if (d == null)
+			return;
+
+		var data = result.seriesOf(d);
+		var bars = (IBarSeries<?>) chart.getSeriesSet()
+				.createSeries(SeriesType.BAR, "#data");
+		bars.setYSeries(data);
+		bars.setBarColor(Colors.get(178, 223, 219));
+
+		var unit = Strings.notEmpty(d.referenceUnit)
+				? d.referenceUnit
+				: "-";
+		chart.getAxisSet().getYAxis(0)
+				.getTitle()
+				.setText(unit);
+		chart.getAxisSet().adjustRange();
+		chart.redraw();
 	}
 }

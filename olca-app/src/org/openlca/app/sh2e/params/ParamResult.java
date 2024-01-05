@@ -35,4 +35,15 @@ record ParamResult(
 	List<ImpactDescriptor> impacts() {
 		return new ArrayList<>(results.keySet());
 	}
+
+	double[] seriesOf(ImpactDescriptor d) {
+		if (d == null || results == null)
+			return new double[0];
+		var list = results.get(d);
+		if (list == null)
+			return new double[0];
+		return list.stream()
+				.mapToDouble(Double::doubleValue)
+				.toArray();
+	}
 }
