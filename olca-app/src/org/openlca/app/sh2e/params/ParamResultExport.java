@@ -5,9 +5,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openlca.app.util.Labels;
 import org.openlca.core.model.ParameterRedef;
 import org.openlca.io.xls.Excel;
+import org.openlca.util.Strings;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 class ParamResultExport implements Runnable {
@@ -28,6 +30,7 @@ class ParamResultExport implements Runnable {
 			var sheet = wb.createSheet("Results");
 			writeSetupSection(sheet);
 			writeParameterSection(sheet);
+			writeResultSection(sheet);
 			sheet.autoSizeColumn(0);
 			sheet.autoSizeColumn(1);
 			try (var out = new FileOutputStream(target)) {
@@ -99,5 +102,29 @@ class ParamResultExport implements Runnable {
 		return redef.contextId == null
 				? redef.name
 				: redef.name + "/" + redef.contextId;
+	}
+
+	private void writeResultSection(Sheet sheet) {
+		Excel.cell(sheet, row++, 0, "Impact assessment results");
+		Excel.cell(sheet, row, 0, "Impact category");
+		Excel.cell(sheet, row, 1, "Unit");
+		Excel.cell(sheet, row, 5, "Iteration");
+		for (int i = 0; i < result.count(); i++) {
+			Excel.cell(sheet, row, 6 + i, i + 1);
+		}
+		row++;
+
+		var impacts = new ArrayList<>(result.impacts());
+		impacts.sort(
+				(i1, i2) -> Strings.compare(Labels.name(i1), Labels.name(i2)));
+		for (var impact : impacts) {
+			Excel.cell(sheet, row, 0, Labels.name(impact));
+			Excel.cell(sheet, row, 1, impact.referenceUnit);
+			var values = result.seriesOf(impact);
+			for (int i = 0; i < values.length; i++) {
+				Excel.cell(sheet, row, 6 + i, values[i]);
+			}
+			row++;
+		}
 	}
 }
