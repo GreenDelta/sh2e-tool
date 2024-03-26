@@ -181,8 +181,7 @@ class TemplateWizard extends Wizard {
 				settings.put(Scope.VEHICLE_COMSUMPTION, transportationPage.consumption());
 				settings.put(Scope.FUNCTIONAL_UNIT, transportationPage.unit());
 			}
-			if (usePurposePage.purpose() == UsePurpose.FUELS
-					|| usePurposePage.purpose() == UsePurpose.CHEMICALS) {
+			if (usePurposePage.purpose() == UsePurpose.FUEL_CHEMICAL) {
 				settings.put(Scope.FUEL_PURITY, fuelsChemicalPage.purity());
 				settings.put(Scope.FUEL_PRESSURE, fuelsChemicalPage.pressure());
 				settings.put(Scope.FUEL_TEMPERATURE, fuelsChemicalPage.temperature());
@@ -254,10 +253,8 @@ class TemplateWizard extends Wizard {
 			templatePage.addFilter(usePurposePage.purpose());
 			if (usePurposePage.purpose() == UsePurpose.TRANSPORTATION)
 				return transportationPage;
-			if (usePurposePage.purpose() == UsePurpose.FUELS)
-				return fuelsChemicalPage.forFuel(true);
-			if (usePurposePage.purpose() == UsePurpose.CHEMICALS)
-				return fuelsChemicalPage.forFuel(false);
+			if (usePurposePage.purpose() == UsePurpose.FUEL_CHEMICAL)
+				return fuelsChemicalPage;
 			if (usePurposePage.purpose() == UsePurpose.ELECTRICITY) {
 				templatePage.addFilter(FunctionalUnit.MJ_ELEC);
 				return comparativePage;

@@ -382,9 +382,7 @@ final class Sh2e {
 
 		TRANSPORTATION("Transportation"),
 
-		FUELS("Fuels production"),
-
-		CHEMICALS("Fuels or chemical production"),
+		FUEL_CHEMICAL("Fuel/Chemical production"),
 
 		ELECTRICITY("Electricity production"),
 
