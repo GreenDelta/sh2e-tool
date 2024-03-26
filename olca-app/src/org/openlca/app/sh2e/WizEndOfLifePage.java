@@ -48,6 +48,9 @@ class WizEndOfLifePage extends WizardPage {
 				setPageComplete(true);
 			}
 		});
+
+		UI.label(body, "* Disclaimer: This formula is not implemented as part of "
+				+ "the tool but rather for documentation purposes.");
 	}
 
 	private void eval(Text text) {

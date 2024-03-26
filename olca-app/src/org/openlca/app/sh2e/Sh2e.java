@@ -193,7 +193,7 @@ final class Sh2e {
 
 		AVOIDED("Recycling approach"),
 
-		CIRCULAR("Circular footprint formula"),
+		CIRCULAR("Circular footprint formula *"),
 
 		OTHER("Other approach, please state:");
 

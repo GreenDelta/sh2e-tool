@@ -29,7 +29,7 @@ class WizStartPage extends WizardPage {
 		setControl(body);
 
 		var group = OptionGroup.of(
-				"Goal & scope",
+				"Intended application",
 				"Is the application of the LCA " +
 						"intended for decision support?",
 				Option.Yes, Option.No
