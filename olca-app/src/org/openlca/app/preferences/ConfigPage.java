@@ -39,7 +39,7 @@ public class ConfigPage extends PreferencePage implements
 		try {
 			iniFile = ConfigIniFile.read();
 		} catch (Exception e) {
-			log.error("failed to read openLCA.ini", e);
+			log.error("failed to read FCH-LCA.ini", e);
 			iniFile = new ConfigIniFile();
 		}
 	}

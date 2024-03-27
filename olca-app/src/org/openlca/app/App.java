@@ -47,7 +47,7 @@ public class App {
 
 	/**
 	 * Get the folder where openLCA is installed. This is where our native math
-	 * libraries and the openLCA.ini file are located. On macOS this is the
+	 * libraries and the FCH-LCA.ini file are located. On macOS this is the
 	 * folder `openLCA.app/Contents/Eclipse`.
 	 */
 	public static File getInstallLocation() {

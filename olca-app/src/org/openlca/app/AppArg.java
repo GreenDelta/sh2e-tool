@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Application arguments that can be passed to the application via the command
- * line or the openLCA.ini file.
+ * line or the FCH-LCA.ini file.
  */
 public enum AppArg {
 

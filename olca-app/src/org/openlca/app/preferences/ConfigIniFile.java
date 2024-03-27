@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Reads and writes values from and to the openLCA.ini file which is located in
+ * Reads and writes values from and to the FCH-LCA.ini file which is located in
  * the installation directory of openLCA. Writing is not possible when openLCA
  * is installed in a read-only folder.
  */
@@ -35,7 +35,7 @@ class ConfigIniFile {
 			return parseFile(iniFile);
 		} catch (Exception e) {
 			Logger log = LoggerFactory.getLogger(ConfigIniFile.class);
-			log.error("failed to read openLCA.ini file", e);
+			log.error("failed to read FCH-LCA.ini file", e);
 			return new ConfigIniFile();
 		}
 	}
@@ -131,7 +131,7 @@ class ConfigIniFile {
 
 		} catch (Exception e) {
 			Logger log = LoggerFactory.getLogger(ConfigIniFile.class);
-			log.error("failed to write openLCA.ini file", e);
+			log.error("failed to write FCH-LCA.ini file", e);
 		}
 	}
 
@@ -148,7 +148,7 @@ class ConfigIniFile {
 
 	private static File getIniFile() {
 		var dir = App.getInstallLocation();
-		return new File(dir, "openLCA.ini");
+		return new File(dir, "FCH-LCA.ini");
 	}
 
 	private static ConfigIniFile parseFile(File iniFile) throws Exception {

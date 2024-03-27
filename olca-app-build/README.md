@@ -13,6 +13,7 @@ select the following options in the export dialog:
 * (take the defaults for the others)
 
 In the next page, select the platforms for which you want to build the product.
+Please note that only the Windows export is managed at the moment.
 After the export, you need to run the package module `package` to copy
 resources like the Java runtime, the native math libraries, etc. to the
 application folder and to create the installers.
@@ -21,8 +22,8 @@ The packager script can build distribution packages for the following platforms
 (but you do not need to build them all, if a platform product is missing it is
 simply ignored in the package script):
 
-* Linux gtk x86_64
-* macOS cocoa x86_64
+* (Linux gtk x86_64)
+* (macOS cocoa x86_64)
 * Windows win32 x86_64
 
 The packager script may download build tools (7zip, NSIS on Windows), the JRE,
@@ -55,12 +56,18 @@ and native libraries if these are missing.
    python -m package
    ```
 
-   Note: To also create the Windows installer, add `--winstaller` to the 
+   Note: To also create the Windows installer, add `--winstaller` to the
    command and to package _MKL_ native library instead of _BLAS_, add  `--mkl`.
+
+5. Run the renaming/archiver script `sh2e.py`.
+
+   ```bash
+   python sh2e.py
+   ```
 
 -------------
 
-#### Independent distribution
+#### Independent distribution (never tested)
 Prepare the independent distribution of the Mac app (`.dmg`) (only on macOS).
 
 In order to pass the Gatekeeper protection, the Mac bundle freshly packaged has
@@ -175,4 +182,4 @@ Multiple steps are necessary to combine the different icons into a `.ico` file:
 
 ```bash
 convert 16_8bit.bmp 16_32bit.bmp 32_8bit.bmp 32_32bit.bmp 48_8bit.bmp 48_32bit.bmp 256_32bit.bmp logo.ico
-``` 
+```
