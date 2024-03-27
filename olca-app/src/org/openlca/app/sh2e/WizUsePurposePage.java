@@ -1,6 +1,5 @@
 package org.openlca.app.sh2e;
 
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.openlca.app.sh2e.Sh2e.Option;
