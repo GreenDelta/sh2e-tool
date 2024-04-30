@@ -1,5 +1,12 @@
 package org.openlca.app.sh2e.params;
 
+import java.text.ChoiceFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.stream.IntStream;
+
 import org.eclipse.nebula.jface.tablecomboviewer.TableComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -34,11 +41,6 @@ import org.openlca.app.viewers.Viewers;
 import org.openlca.core.model.RootEntity;
 import org.openlca.core.model.descriptors.ImpactDescriptor;
 import org.openlca.util.Strings;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
-import java.util.Locale;
 
 public class ParameterAnalysisResultPage extends SimpleFormEditor {
 
@@ -147,16 +149,17 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 
 			// configure the x-axis with one category
 			var x = chart.getAxisSet().getXAxis(0);
-			x.getTitle().setVisible(false);
-			x.getTick().setVisible(false);
-			x.getGrid().setVisible(false);
+			x.getTitle().setText("Iterations");
+			x.getTitle().setFont(UI.defaultFont());
+			x.getTitle().setForeground(body.getForeground());
+			x.getTick().setForeground(body.getForeground());
+			x.getGrid().setStyle(LineStyle.NONE);
 
 			// configure the y-axis
 			var y = chart.getAxisSet().getYAxis(0);
 			y.getTitle().setFont(UI.defaultFont());
 			y.getTitle().setForeground(body.getForeground());
 			y.getTick().setForeground(body.getForeground());
-			y.getGrid().setStyle(LineStyle.NONE);
 			y.getTick().setFormat(new DecimalFormat("0.0E0#",
 					new DecimalFormatSymbols(Locale.US)));
 
@@ -176,8 +179,12 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			return;
 
 		var data = result.seriesOf(d);
+		var xSeries = IntStream.rangeClosed(1, data.length)
+				.asDoubleStream()
+				.toArray();
 		var bars = (IBarSeries<?>) chart.getSeriesSet()
 				.createSeries(SeriesType.BAR, "#data");
+		bars.setXSeries(xSeries);
 		bars.setYSeries(data);
 		bars.setBarColor(Colors.get(178, 223, 219));
 
@@ -187,6 +194,14 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 		chart.getAxisSet().getYAxis(0)
 				.getTitle()
 				.setText(unit);
+
+		var ticks = IntStream.rangeClosed(1, data.length)
+				.mapToObj(String::valueOf)
+				.toArray(String[]::new);
+		chart.getAxisSet().getXAxis(0)
+				.getTick()
+				.setFormat(new ChoiceFormat(xSeries, ticks));
+
 		chart.getAxisSet().adjustRange();
 		chart.redraw();
 	}
