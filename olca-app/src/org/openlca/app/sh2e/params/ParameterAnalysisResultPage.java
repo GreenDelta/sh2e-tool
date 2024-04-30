@@ -3,12 +3,17 @@ package org.openlca.app.sh2e.params;
 import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.stream.IntStream;
 
+import org.eclipse.jface.viewers.BaseLabelProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.nebula.jface.tablecomboviewer.TableComboViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swtchart.Chart;
 import org.eclipse.swtchart.IBarSeries;
@@ -35,9 +40,11 @@ import org.openlca.app.util.Controls;
 import org.openlca.app.util.ErrorReporter;
 import org.openlca.app.util.FileType;
 import org.openlca.app.util.Labels;
+import org.openlca.app.util.Numbers;
 import org.openlca.app.util.Popup;
 import org.openlca.app.util.UI;
 import org.openlca.app.viewers.Viewers;
+import org.openlca.app.viewers.tables.Tables;
 import org.openlca.core.model.RootEntity;
 import org.openlca.core.model.descriptors.ImpactDescriptor;
 import org.openlca.util.Strings;
@@ -83,6 +90,7 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			var tk = mForm.getToolkit();
 			var body = UI.body(form, tk);
 			setupSection(body, tk);
+			tableSection(body, tk);
 			chartSection(body, tk);
 			form.reflow(true);
 		}
@@ -125,8 +133,31 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 			Controls.onClick(link, $ -> App.open(e));
 		}
 
-		private void chartSection(Composite body, FormToolkit tk) {
+		private void tableSection(Composite body, FormToolkit tk) {
 			var comp = UI.formSection(body, tk, "Impact assessment results");
+			UI.gridData(comp, true, true);
+
+			var label = new Label();
+			var header = new ArrayList<>(Collections.singleton(M.ImpactCategory));
+			IntStream.rangeClosed(1, result.seq().count())
+					.mapToObj(String::valueOf)
+					.forEach(header::add);
+
+			var table = Tables.createViewer(comp, header.toArray(String[]::new), label);
+
+			var widths = new ArrayList<>(Collections.singleton(0.3));
+			var count = result.seq().count();
+			widths.addAll(Collections.nCopies(count, 0.1));
+			var widthsDouble = widths.stream().mapToDouble(Double::valueOf).toArray();
+			Tables.bindColumnWidths(table, widthsDouble);
+
+			Viewers.sortByLabels(table, label, 0);
+			table.setInput(result.results().keySet());
+		}
+
+		private void chartSection(Composite body, FormToolkit tk) {
+			var comp = UI.formSection(body, tk,
+					"Impact assessment results per category");
 			UI.gridLayout(comp, 1);
 			var top = tk.createComposite(comp);
 			UI.fillHorizontal(top);
@@ -205,4 +236,33 @@ public class ParameterAnalysisResultPage extends SimpleFormEditor {
 		chart.getAxisSet().adjustRange();
 		chart.redraw();
 	}
+
+	private class Label extends BaseLabelProvider implements
+			ITableLabelProvider {
+
+		@Override
+		public Image getColumnImage(Object element, int col) {
+			if (!(element instanceof ImpactDescriptor d))
+				return null;
+			if (col == 0) {
+				return Images.get(d);
+			}
+			return null;
+		}
+
+		@Override
+		public String getColumnText(Object o, int col) {
+			if (!(o instanceof ImpactDescriptor i))
+				return null;
+			if (col == 0) {
+				var unit = Strings.notEmpty(i.referenceUnit)
+						? " (" + i.referenceUnit + ")"
+						: "";
+				return i.name + unit;
+			}
+			var val = result.seriesOf(i)[col - 1];
+			return Numbers.format(val);
+		}
+	}
+
 }
